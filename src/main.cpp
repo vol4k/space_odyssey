@@ -1,7 +1,8 @@
 #include <iostream>
-#include "preferences.h"
-#include "lib/glad.h"
+#include "preferences.hpp"
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm/glm.hpp>
 
 int main()
 {
