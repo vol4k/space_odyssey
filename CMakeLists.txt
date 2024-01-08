@@ -18,8 +18,10 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${SRC_DIR})
 
+# OpenGL
 find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
+link_libraries(${OPENGL_LIBRARIES})
 
 # glfw
 set(GLFW_DIR ${LIB_DIR}/glfw)
@@ -32,15 +34,13 @@ target_link_libraries(${PROJECT_NAME} glfw ${GLFW_LIBRARIES})
 target_include_directories(${PROJECT_NAME} PRIVATE ${GLFW_DIR}/include)
 target_compile_definitions(${PROJECT_NAME} PRIVATE GLFW_INCLUDE_NONE)
 
-# glad
-set(GLAD_DIR ${LIB_DIR}/glad)
-add_library(glad ${GLAD_DIR}/src/glad.c)
-target_include_directories(glad PRIVATE ${GLAD_DIR}/include)
-target_include_directories(${PROJECT_NAME} PRIVATE ${GLAD_DIR}/include)
-target_link_libraries(${PROJECT_NAME} glad ${CMAKE_DL_LIBS})
+# glew
+set(GLEW_DIR ${LIB_DIR}/glew)
+add_library(glew ${GLEW_DIR}/src/glew.c)
+target_include_directories(glew PRIVATE ${GLEW_DIR}/include)
+target_include_directories(${PROJECT_NAME} PRIVATE ${GLEW_DIR}/include)
+target_link_libraries(${PROJECT_NAME} glew ${CMAKE_DL_LIBS})
 
 # glm
 set(GLM_DIR ${LIB_DIR}/glm)
 include_directories(${GLM_DIR})
-
-# sdl
