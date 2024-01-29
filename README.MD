@@ -2,8 +2,9 @@
 
 Computer graphics project at Adam Mickewicz University.
 
-
 ```
+git submodule update --init --recursive
+
 .\configure.sh
 .\build.sh
 .\run.sh
