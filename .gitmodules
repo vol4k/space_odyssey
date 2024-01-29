@@ -7,3 +7,6 @@
 [submodule "deps/glfw"]
 	path = deps/glfw
 	url = https://github.com/glfw/glfw.git
+[submodule "deps/freeglut"]
+	path = deps/freeglut
+	url = https://github.com/freeglut/freeglut.git
