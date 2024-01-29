@@ -10,3 +10,6 @@
 [submodule "deps/freeglut"]
 	path = deps/freeglut
 	url = https://github.com/freeglut/freeglut.git
+[submodule "deps/assimp"]
+	path = deps/assimp
+	url = https://github.com/assimp/assimp.git
