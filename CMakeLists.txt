@@ -1,37 +1,38 @@
-cmake_minimum_required(VERSION 3.13.0)
+cmake_minimum_required(VERSION 3.14.0)
 
-set(PROJECT_NAME opengl_space_odyssey)
+project(opengl_space_odyssey)
 
-set(BUILD_DIR ${CMAKE_CURRENT_BINARY_DIR})
+project(${PROJECT_NAME} VERSION 0.0.2 LANGUAGES CXX)
+
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
-set(LIB_DIR ${CMAKE_CURRENT_SOURCE_DIR}/libs)
-set(
-  SOURCES
 
+set(SOURCES 
   ${SRC_DIR}/main.cpp
-  ${SRC_DIR}/Camera.cpp
-  ${SRC_DIR}/ex_8_1.hpp
-  ${SRC_DIR}/ex_8_2.hpp
-  ${SRC_DIR}/Render_Utils.h
+  ${SRC_DIR}/OWindow.cpp
 )
-
-project(${PROJECT_NAME} VERSION 0.0.1)
-
-add_subdirectory(libs/glfw)
-add_subdirectory(libs/glew)
-add_subdirectory(libs/glm)
-add_subdirectory(libs/freeglut)
-add_subdirectory(libs/assimp)
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${LIB_DIR}/glfw/include)
-target_include_directories(${PROJECT_NAME} PUBLIC ${LIB_DIR}/glew/include)
-target_include_directories(${PROJECT_NAME} PUBLIC ${LIB_DIR}/glm)
-target_include_directories(${PROJECT_NAME} PUBLIC ${LIB_DIR}/freeglut/include)
-target_include_directories(${PROJECT_NAME} PUBLIC ${LIB_DIR}/assimp/include)
+add_subdirectory(deps/glew)
+add_subdirectory(deps/glfw)
+add_subdirectory(deps/glm)
+add_subdirectory(deps/freeglut)
+#add_subdirectory(deps/assimp)
 
-file(COPY ${BUILD_DIR}/include/assimp/config.h DESTINATION ${LIB_DIR}/assimp/include/assimp/)
-file(COPY ${BUILD_DIR}/revision.h DESTINATION ${LIB_DIR}/assimp/include/assimp/)
+target_include_directories(${PROJECT_NAME} 
+  PUBLIC deps/glew/include
+  PUBLIC deps/glfw/include
+  PUBLIC deps/glm/glm
+  PUBLIC deps/freeglut/include
+  #PUBLIC deps/assimp/include
+)
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${SRC_DIR})
+target_link_directories(${PROJECT_NAME}
+  PRIVATE deps/glew/lib
+  PRIVATE deps/glfw/src
+  PRIVATE deps/glm/glm
+  PRIVATE deps/freeglut/lib
+  #PRIVATE deps/assimp/lib
+)
+
+target_link_libraries(${PROJECT_NAME} glfw libglew_shared glm freeglut)# assimp)

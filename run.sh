@@ -1,14 +1,4 @@
-#!/bin/sh
-mkdir build
+#! /bin/sh
+
 cd build
-cmake ..
-cmake --build .
-case `uname` in
-  'Linux') 
-  ./opengl_space_odyssey;;
-  'WindowsNT')  
-  ./opengl_space_odyssey.exe;;
-  *)
-  echo "unknown: $OSTYPE" ;;
-esac
-exit
+./opengl_space_odyssey

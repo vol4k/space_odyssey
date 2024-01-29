@@ -1,47 +1,9 @@
-#include <GL/glew.h>
-
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include "glm/ext.hpp"
-#include <iostream>
-#include <cmath>
-
-#include "ex_8_1.hpp"
-
-
+#include "OWindow.hpp"
 
 int main(int argc, char** argv)
 {
-	// inicjalizacja glfw
-	glfwInit();
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-#ifdef __APPLE__
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
-
-	// tworzenie okna za pomoca glfw
-	GLFWwindow* window = glfwCreateWindow(500, 500, "FirstWindow", NULL, NULL);
-	if (window == NULL)
-	{
-		std::cout << "Failed to create GLFW window" << std::endl;
-		glfwTerminate();
-		return -1;
-	}
-	glfwMakeContextCurrent(window);
-
-	// ladowanie OpenGL za pomoca glew
-	glewInit();
-	glViewport(0, 0, 500, 500);
-
-	init(window);
-
-	// uruchomienie glownej petli
-	renderLoop(window);
-
-	shutdown(window);
-	glfwTerminate();
-	return 0;
+	OWindow main_window = OWindow();
+	main_window.init(500,500);
+	main_window.renderLoop();
+	return EXIT_SUCCESS;
 }
