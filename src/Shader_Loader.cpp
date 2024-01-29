@@ -1,7 +1,7 @@
-#include "Shader_Loader.h" 
-#include<iostream>
-#include<fstream>
-#include<vector>
+#include "Shader_Loader.h"
+#include <iostream>
+#include <fstream>
+#include <vector>
 
 using namespace Core;
 

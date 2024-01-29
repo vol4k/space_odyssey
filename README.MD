@@ -2,7 +2,13 @@
 
 Computer graphics project at Adam Mickewicz University.
 
+
 # Preparing
+
+- On Ubuntu/Debian you need to run in terminal command below:
+```
+sudo apt install libglu1-mesa-dev
+```
 
 - To build and run project just run `run.sh` script.
 ```

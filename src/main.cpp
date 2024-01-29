@@ -1,48 +1,47 @@
-#include <iostream>
-#include "preferences.hpp"
-#include <gelf.h>
+#include <GL/glew.h>
+
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include "glm/ext.hpp"
+#include <iostream>
+#include <cmath>
 
-int main()
+#include "ex_8_1.hpp"
+
+
+
+int main(int argc, char** argv)
 {
-  std::cout << "Hello world!" << std::endl;
-  
-  return 0;
+	// inicjalizacja glfw
+	glfwInit();
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
+#ifdef __APPLE__
+	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#endif
+
+	// tworzenie okna za pomoca glfw
+	GLFWwindow* window = glfwCreateWindow(500, 500, "FirstWindow", NULL, NULL);
+	if (window == NULL)
+	{
+		std::cout << "Failed to create GLFW window" << std::endl;
+		glfwTerminate();
+		return -1;
+	}
+	glfwMakeContextCurrent(window);
+
+	// ladowanie OpenGL za pomoca glew
+	glewInit();
+	glViewport(0, 0, 500, 500);
+
+	init(window);
+
+	// uruchomienie glownej petli
+	renderLoop(window);
+
+	shutdown(window);
+	glfwTerminate();
+	return 0;
 }
-
-/*
-int main()
-{
-  GLFWwindow* window;
-
-  if (!glfwInit())
-  {
-    return -1;
-  }
-
-  window = glfwCreateWindow(window::height, window::width, window::title, NULL, NULL);
-  glfwMakeContextCurrent(window);
-
-
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-  {
-    std::cout << "Couldn't load opengl" << std::endl;
-    glfwTerminate();
-    return -1;
-  }
-
-  glClearColor(window::c.r,window::c.g,window::c.b,window::c.a);
-
-  while (!glfwWindowShouldClose(window))
-  {
-    glfwPollEvents();
-
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glfwSwapBuffers(window);
-  }
-
-  return 0;
-}
-*/
