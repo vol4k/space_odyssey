@@ -3,7 +3,7 @@
 Computer graphics project at Adam Mickewicz University.
 
 ```
-git submodule update --init --recursive
+git submodule update --init --recursive --progress
 
 .\configure.sh
 .\build.sh
@@ -20,4 +20,4 @@ git submodule update --init --recursive
   - [x] `FreeGLUT`  <br>_is a free-software/open-source alternative to the OpenGL Utility Toolkit (GLUT) library._
   - [x] `Assimp`    <br>_is a cross-platform 3D model import library which aims to provide a common application programming interface (API) for different 3D asset file formats.
 - [ ] ...
-- [ ] prepaire project to run on **Windows**
+- [x] prepaire project to run on **Windows**
