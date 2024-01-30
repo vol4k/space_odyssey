@@ -8,6 +8,9 @@ class OWindow
   private:
   int status = 0;
 
+  int width;
+  int height;
+
   float aspectRatio = 1.f;
   GLFWwindow* window;
   GLuint program;
@@ -18,8 +21,8 @@ class OWindow
   void shutdown(GLFWwindow* window);
 
   public:
-  OWindow();
+  OWindow(int width, int height);
   ~OWindow();
-  void init(int height, int width);
+  void init();
   void renderLoop();
 };

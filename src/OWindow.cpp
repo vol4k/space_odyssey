@@ -5,8 +5,11 @@ void OWindow::shutdown(GLFWwindow* window)
   //shaderLoader.DeleteProgram(program);
 }
 
-OWindow::OWindow()
+OWindow::OWindow(int width=800, int height=600)
 {
+  this->width=width;
+  this->height=height;
+
   // inicjalizacja glfw
   glfwInit();
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -19,7 +22,7 @@ OWindow::OWindow()
 
 
   // tworzenie okna za pomoca glfw
-  window = glfwCreateWindow(500, 500, "Space Odysey", NULL, NULL);
+  window = glfwCreateWindow(width, height, "Space Odysey", NULL, NULL);
   if (window == NULL)
   {
     std::cout << "Failed to create GLFW window" << std::endl;
@@ -41,11 +44,11 @@ void OWindow::framebuffer_size_callback(GLFWwindow* window, int width, int heigh
 	glViewport(0, 0, width, height);
 }
 
-void OWindow::init(int height, int width)
+void OWindow::init()
 {
   glewInit();
-  glViewport(0, 0, width, height);
-  aspectRatio = width / float(height);
+  glViewport(0, 0, this->width, this->height);
+  aspectRatio = this->width / float(this->height);
 
   glfwSetFramebufferSizeCallback(window, OWindow::framebuffer_size_callback);
 

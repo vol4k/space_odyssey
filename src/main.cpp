@@ -2,8 +2,13 @@
 
 int main(int argc, char** argv)
 {
-	OWindow main_window = OWindow();
-	main_window.init(500,500);
+	const int width = 800;
+	const int height = 600;
+
+	OWindow main_window = OWindow(width, height);
+	
+	main_window.init();
 	main_window.renderLoop();
+	
 	return EXIT_SUCCESS;
 }
