@@ -2,13 +2,15 @@ cmake_minimum_required(VERSION 3.14.0)
 
 project(opengl_space_odyssey)
 
-project(${PROJECT_NAME} VERSION 0.0.2 LANGUAGES CXX)
+project(${PROJECT_NAME} VERSION 0.0.3 LANGUAGES CXX)
 
 set(SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 set(SOURCES 
   ${SRC_DIR}/main.cpp
   ${SRC_DIR}/OWindow.cpp
+  ${SRC_DIR}/OGame.cpp
+  ${SRC_DIR}/OGraphicsEngine.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

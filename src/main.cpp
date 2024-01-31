@@ -1,14 +1,9 @@
-#include "OWindow.hpp"
+#include "OGame.hpp"
 
 int main(int argc, char** argv)
 {
-	const int width = 800;
-	const int height = 600;
-
-	OWindow main_window = OWindow(width, height);
-	
-	main_window.init();
-	main_window.renderLoop();
+	OGame game = OGame(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT);
+	game.run();
 	
 	return EXIT_SUCCESS;
 }

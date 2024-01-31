@@ -1,28 +1,23 @@
 #pragma once
-#include <iostream>
+#include <stdexcept>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#define WINDOW_TITLE "Space Odysey"
+#define DEFAULT_WINDOW_WIDTH 800
+#define DEFAULT_WINDOW_HEIGHT 600
+
 class OWindow
 {
-  private:
-  int status = 0;
-
+  protected:
   int width;
   int height;
 
   float aspectRatio = 1.f;
   GLFWwindow* window;
-  GLuint program;
-  GLuint programSun;
-  //Core::Shader_Loader shaderLoader;
-
-  static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-  void shutdown(GLFWwindow* window);
-
+  
   public:
   OWindow(int width, int height);
   ~OWindow();
-  void init();
-  void renderLoop();
+  bool windowShouldClose();
 };
