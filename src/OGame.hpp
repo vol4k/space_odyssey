@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "OGraphicsEngine.hpp"
+#include "OGameObject.hpp"
 
 class OGame
 {
@@ -15,6 +16,11 @@ class OGame
   bool is_ok;
   OGraphicsEngine* engine;
 
+  OShaderUnit* shader;
+  
+  OGameObject* spaceship;
+
   void processInput();
   void renderScene();
+  void initResources();
 };

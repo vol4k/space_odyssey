@@ -38,9 +38,9 @@ bash .\run.sh
   - [x] `Assimp`    <br>_is a cross-platform 3D model import library which aims to provide a common application programming interface (API) for different 3D asset file formats._
 
 - [ ] project features
-  - [ ] shaderLoader
+  - [x] shaderLoader
   - [ ] textureLoader
-  - [ ] modelLoader
+  - [x] modelLoader
   - [ ] Quaternions
   - [ ] Normal mapping
   - [ ] Physics-based rendering (PBR)
