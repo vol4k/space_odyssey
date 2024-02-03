@@ -16,9 +16,11 @@ class OGame
   bool is_ok;
   OGraphicsEngine* engine;
 
-  OShaderUnit* shader;
+  OShaderUnit* spaceshipShader;
+  OShaderUnit* sphereShader;
   
   OGameObject* spaceship;
+  OGameObject* sphere;
 
   void processInput();
   void renderScene();

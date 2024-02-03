@@ -1,13 +1,12 @@
 #pragma once
 #define GLM_ENABLE_EXPERIMENTAL
 #include "OWindow.hpp"
-#include "ORenderUnit.hpp"
+#include "OResourceUnit.hpp"
 #include "OShaderUnit.hpp"
 #include "OGameObject.hpp"
 #include <glm.hpp>
 #include <glm/ext.hpp>
 #include <glm/gtx/euler_angles.hpp>
-#include <assimp/Importer.hpp>
 
 class OGraphicsEngine: private OWindow
 {
@@ -22,12 +21,17 @@ class OGraphicsEngine: private OWindow
   glm::vec3 spotlightConeDir = glm::vec3(0, 0, 0);
   glm::vec3 spotlightColor = glm::vec3(0.5, 0.9, 0.8)*10.f;
   float spotlightPhi = 3.14 / 3;
+  
+  glm::vec3 reflectorColor = glm::vec3(0.3f, 0.f, 0.f);
+  float reflectorAngle = glm::radians(25.f);
+  float reflectorLightExp = 5;
 
   static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
   glm::mat4 createCameraMatrix();
   glm::mat4 createPerspectiveMatrix();
   void drawObjectColor(OGameObject& obj, glm::mat4 modelMatrix, glm::vec3 color);
+  void drawObjectProc(OGameObject& obj, glm::mat4 modelMatrix, glm::vec3 color);
 
   public:
   glm::vec3 cameraPos = glm::vec3(-4.f, 0, 0);
@@ -38,6 +42,5 @@ class OGraphicsEngine: private OWindow
 
   GLFWwindow* getWindow();
 
-  void render(OGameObject& spaceship);
-  static void loadModelToContext(std::string path, ORenderUnit::RenderContext& context);
+  void render(OGameObject& spaceship, OGameObject& sphere);
 };

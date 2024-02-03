@@ -13,3 +13,6 @@
 [submodule "deps/assimp"]
 	path = deps/assimp
 	url = https://github.com/assimp/assimp.git
+[submodule "deps/soil2"]
+	path = deps/soil2
+	url = https://github.com/SpartanJ/SOIL2.git

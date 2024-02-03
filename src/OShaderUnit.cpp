@@ -1,6 +1,6 @@
 #include "OShaderUnit.hpp"
 
-OShaderUnit::OShaderUnit(char* vertexShaderFilename, char* fragmentShaderFilename)
+OShaderUnit::OShaderUnit(std::string vertexShaderFilename, std::string fragmentShaderFilename)
 {
   // load shaders
 	std::string vertex_shader_code = ReadShader(vertexShaderFilename);
@@ -38,11 +38,12 @@ OShaderUnit::~OShaderUnit()
   glDeleteProgram(program);
 }
 
-std::string OShaderUnit::ReadShader(char *filename)
+std::string OShaderUnit::ReadShader(std::string filename)
 {
 
 	std::string shaderCode;
-	std::ifstream file(filename, std::ios::in);
+	std::string filepath = "res/shaders/" + filename;
+	std::ifstream file(filepath, std::ios::in);
 
 	if (!file.good())
 	{
@@ -58,8 +59,7 @@ std::string OShaderUnit::ReadShader(char *filename)
 	return shaderCode;
 }
 
-GLuint OShaderUnit::CreateShader(GLenum shaderType, std::string
-	source, char* shaderName)
+GLuint OShaderUnit::CreateShader(GLenum shaderType, std::string source, std::string shaderName)
 {
 	int compile_result = 0;
 
@@ -79,7 +79,7 @@ GLuint OShaderUnit::CreateShader(GLenum shaderType, std::string
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &info_log_length);
 		std::vector<char> shader_log(info_log_length);
 		glGetShaderInfoLog(shader, info_log_length, NULL, &shader_log[0]);
-    throw std::runtime_error(std::string("ERROR compiling shader: ") + std::string(shaderName) + std::string(&shader_log[0] + '\n'));
+    throw std::runtime_error(std::string("ERROR compiling shader: ") + shaderName + std::string(&shader_log[0] + '\n'));
 	}
 
 	return shader;

@@ -11,7 +11,7 @@ set(SOURCES
   ${SRC_DIR}/OWindow.cpp
   ${SRC_DIR}/OGame.cpp
   ${SRC_DIR}/OGraphicsEngine.cpp
-  ${SRC_DIR}/ORenderUnit.cpp
+  ${SRC_DIR}/OResourceUnit.cpp
   ${SRC_DIR}/OShaderUnit.cpp
   ${SRC_DIR}/OGameObject.cpp
 )
@@ -23,6 +23,7 @@ add_subdirectory(deps/glfw)
 add_subdirectory(deps/glm)
 add_subdirectory(deps/freeglut)
 add_subdirectory(deps/assimp)
+add_subdirectory(deps/soil2)
 
 target_include_directories(${PROJECT_NAME} 
   PUBLIC deps/glew/include
@@ -30,6 +31,7 @@ target_include_directories(${PROJECT_NAME}
   PUBLIC deps/glm/glm
   PUBLIC deps/freeglut/include
   PUBLIC deps/assimp/include
+  PUBLIC deps/soil2/src
 )
 
 target_link_directories(${PROJECT_NAME}
@@ -38,9 +40,10 @@ target_link_directories(${PROJECT_NAME}
   PRIVATE deps/glm/glm
   PRIVATE deps/freeglut/lib
   PRIVATE deps/assimp/lib
+  PRIVATE deps/soil2
 )
 
-target_link_libraries(${PROJECT_NAME} glfw libglew_shared glm freeglut assimp)
+target_link_libraries(${PROJECT_NAME} glfw libglew_shared glm freeglut assimp soil2)
 
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD 
     COMMAND ${CMAKE_COMMAND} -E copy_directory 

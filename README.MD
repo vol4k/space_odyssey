@@ -36,10 +36,11 @@ bash .\run.sh
   - [x] `GLM`       <br>_is a C++ mathematics library for 3D software based on the OpenGL Shading Language (GLSL) specification._
   - [x] `FreeGLUT`  <br>_is a free-software/open-source alternative to the OpenGL Utility Toolkit (GLUT) library._
   - [x] `Assimp`    <br>_is a cross-platform 3D model import library which aims to provide a common application programming interface (API) for different 3D asset file formats._
+  - [x] `SOIL2`     <br>_is a tiny C library used primarily for uploading textures into OpenGL._
 
 - [ ] project features
   - [x] shaderLoader
-  - [ ] textureLoader
+  - [x] textureLoader
   - [x] modelLoader
   - [ ] Quaternions
   - [ ] Normal mapping

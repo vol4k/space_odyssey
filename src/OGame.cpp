@@ -19,7 +19,10 @@ OGame::OGame(int width=DEFAULT_WINDOW_WIDTH, int height=DEFAULT_WINDOW_HEIGHT)
 
 OGame::~OGame()
 {
-  delete shader;
+  delete spaceship;
+  delete spaceshipShader;
+  delete sphere;
+  delete sphereShader;
   delete engine;
 }
 
@@ -73,16 +76,33 @@ void OGame::processInput()
 
 void OGame::renderScene()
 {
-	engine->render(*spaceship);
+	engine->render(*spaceship, *sphere);
 }
 
 void OGame::initResources()
 {
   try
   {
-    shader = new OShaderUnit("res/shaders/default.vert", "res/shaders/default.frag");
-    spaceship = new OGameObject(shader, glm::vec3(-4.f, 0.f, 0.f), glm::vec3(1.f, 0.f, 0.f));
-    OGraphicsEngine::loadModelToContext("res/models/spaceship.obj", spaceship->getContext());
+    sphereShader = new OShaderUnit("default.vert", "default.frag");
+    spaceshipShader = new OShaderUnit("default.vert", "default.frag");
+
+    spaceship = new OGameObject(
+      spaceshipShader, 
+      "spaceship.obj",
+      "spaceship.jpg",
+      "spaceship_normal.jpg",
+      glm::vec3(0.f, 0.f, 0.f), 
+      glm::vec3(-1.f, 0.f, 0.f)
+    );
+
+    sphere = new OGameObject(
+      sphereShader, 
+      "sphere.obj",
+      "earth.png",
+      "earth_normal.png",
+      glm::vec3(-4.f, 0.f, 0.f), 
+      glm::vec3(1.f, 0.f, 0.f)
+    );
   }
   catch(const std::exception& e)
   {
