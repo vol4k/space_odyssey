@@ -18,6 +18,28 @@ set(SOURCES
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E rm -rf  
+    ${PROJECT_BINARY_DIR}/res
+    COMMENT "Remove resources from binary directory"
+)
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory 
+    ${PROJECT_SOURCE_DIR}/res 
+    ${PROJECT_BINARY_DIR}/res
+    COMMENT "Copying resources into binary directory"
+)
+
+# New in 3.26
+#add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+#    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different 
+#    ${PROJECT_SOURCE_DIR}/res 
+#    ${PROJECT_BINARY_DIR}/res
+#    COMMENT "Update resources if it change"
+#)
+
+
 add_subdirectory(deps/glew)
 add_subdirectory(deps/glfw)
 add_subdirectory(deps/glm)
@@ -44,10 +66,3 @@ target_link_directories(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME} glfw libglew_shared glm freeglut assimp soil2)
-
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD 
-    COMMAND ${CMAKE_COMMAND} -E copy_directory 
-    ${PROJECT_SOURCE_DIR}/res 
-    ${PROJECT_BINARY_DIR}/res
-    COMMENT "Copying resources into binary directory"    
-)
