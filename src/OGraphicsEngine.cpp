@@ -12,7 +12,7 @@ OGraphicsEngine::OGraphicsEngine()
   glEnable(GL_DEPTH_TEST);
 
 	camera = OCamera(
-		/* eye */ glm::vec3(-2.0f,0.0f,0.0f), 
+		/* eye */ glm::vec3(2.0f,0.0f,0.0f), 
 		/* lookat */ glm::vec3(0.0f,0.0f,0.0f), 
 		/* upVector */ glm::vec3(0.0f,1.0f,0.0f)
 	);
@@ -73,7 +73,7 @@ glm::mat4 OGraphicsEngine::createPerspectiveMatrix()
 }
 
 void OGraphicsEngine::updateCamera()
-{
+{	
 	double xPos, yPos;
 	int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
 	glfwGetCursorPos(window, &xPos, &yPos);
@@ -122,8 +122,6 @@ void OGraphicsEngine::render(OGameObject& spaceship, OGameObject& sphere)
 	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glUseProgram(spaceship.getShader().getProgram());
-  
   // calculations
 	updateCamera();
 
@@ -140,7 +138,7 @@ void OGraphicsEngine::render(OGameObject& spaceship, OGameObject& sphere)
 		});
 
   // draw objects
-	drawObjectColor(
+	drawObjectProc(
     spaceship,
 			glm::translate(glm::mat4(1.f), spaceship.pos) * 
 			specshipCameraRotrationMatrix * 
@@ -150,7 +148,7 @@ void OGraphicsEngine::render(OGameObject& spaceship, OGameObject& sphere)
     glm::vec3(0.3, 0.3, 0.5)
 	);
 
-	drawObjectColor(
+	drawObjectProc(
     sphere,
     	glm::translate(glm::mat4(1.f), sphere.pos) * 
       glm::scale(glm::mat4(1.f), 
@@ -158,7 +156,6 @@ void OGraphicsEngine::render(OGameObject& spaceship, OGameObject& sphere)
     glm::vec3(0.5, 0.7, 0.2)
 	);
 
-	glUseProgram(0);
 	glfwSwapBuffers(window);
 }
 
@@ -178,25 +175,15 @@ void OGraphicsEngine::drawObjectColor(OGameObject& obj, glm::mat4 modelMatrix, g
 }
 
 void OGraphicsEngine::drawObjectProc(OGameObject& obj, glm::mat4 modelMatrix, glm::vec3 color) {
-	GLuint program = obj.getShader().getProgram();
+	GLuint program = obj.getShader().getProgram();;
 	glUseProgram(program);
-	OResourceUnit::SetActiveTexture(obj.texture, "colorTexture", program, 0);
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * camera.GetViewMatrix(); //createCameraMatrix();
 	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 	glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
-	glUniformMatrix4fv(glGetUniformLocation(program, "modelMat"), 1, GL_FALSE, (float*)&modelMatrix);
-	//spaceship reflector
-	glm::vec3 reflectorPos = obj.pos + 0.037f * obj.dir;
-	glUniform3f(glGetUniformLocation(program, "reflectorPos"), reflectorPos.x, reflectorPos.y, reflectorPos.z);
-	glUniform3f(glGetUniformLocation(program, "reflectorDir"), obj.dir.x, obj.dir.y, obj.dir.z);
-	glUniform1f(glGetUniformLocation(program, "reflectorAngle"), reflectorAngle);
-	glUniform3f(glGetUniformLocation(program, "reflectorColor"),
-		reflectorColor.x, reflectorColor.y, reflectorColor.z);
-	glUniform1f(glGetUniformLocation(program, "reflectorLightExp"), reflectorLightExp);
-
-	glUniform3f(glGetUniformLocation(program, "cameraPos"), camera.GetEye().x, camera.GetEye().y, camera.GetEye().z);
-	
+	glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
+	glUniform3f(glGetUniformLocation(program, "lightPos"), 0, 0, 0);
+	OResourceUnit::SetActiveTexture(obj.texture, "colorTexture", program, 0);
 	OResourceUnit::DrawContext(obj.getContext());
-	glUseProgram(0);
 
+	glUseProgram(0);
 }

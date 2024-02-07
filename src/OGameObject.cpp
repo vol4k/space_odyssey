@@ -5,7 +5,10 @@ OGameObject::OGameObject(OShaderUnit* shader, std::string modelfile, std::string
 {
   OResourceUnit::loadModelToContext(modelfile, *context);
   texture = OResourceUnit::LoadTexture(texturefile);
-  texture = OResourceUnit::LoadTexture(normalfile);
+  normal = OResourceUnit::LoadTexture(normalfile);
+
+  std::cout << texture << std::endl;
+  std::cout << normal << std::endl;
 }
 
 OGameObject::~OGameObject() 
