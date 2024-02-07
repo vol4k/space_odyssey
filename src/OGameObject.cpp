@@ -7,8 +7,6 @@ OGameObject::OGameObject(OShaderUnit* shader, std::string modelfile, std::string
   texture = OResourceUnit::LoadTexture(texturefile);
   normal = OResourceUnit::LoadTexture(normalfile);
 
-  std::cout << texture << std::endl;
-  std::cout << normal << std::endl;
 }
 
 OGameObject::~OGameObject() 

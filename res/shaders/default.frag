@@ -2,7 +2,6 @@
 
 float AMBIENT = 0.1;
 
-uniform vec3 color;
 uniform vec3 lightPos;
 uniform sampler2D colorTexture;
 
