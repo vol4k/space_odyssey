@@ -20,9 +20,9 @@ git submodule update --init --recursive --progress
 
 Then use commands below to ``configure``, ``build`` and ``run`` project:
 ```bash
-bash .\configure.sh
-bash .\build.sh
-bash .\run.sh
+bash ./configure.sh
+bash ./build.sh
+bash ./run.sh
 ```
 
 ## TODO
@@ -47,6 +47,7 @@ bash .\run.sh
   - [ ] Physics-based rendering (PBR)
   - [ ] Bloom
   - [ ] Parallel transport frames
+  - [ ] SkyBox
   - [ ] ...
 
 - [ ] project storyline

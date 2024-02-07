@@ -8,6 +8,7 @@
 #include <glm.hpp>
 #include <glm/ext.hpp>
 #include <glm/gtx/euler_angles.hpp>
+#include <math.h>
 
 template <typename t> int sgn(t val) {
     return (t(0) < val) - (val < t(0));
@@ -40,7 +41,8 @@ class OGraphicsEngine: private OWindow
   glm::mat4 createPerspectiveMatrix();
   void updateCamera();
   void drawObjectColor(OGameObject& obj, glm::mat4 modelMatrix, glm::vec3 color);
-  void drawObjectProc(OGameObject& obj, glm::mat4 modelMatrix, glm::vec3 color);
+  void drawObjectProc(OGameObject& obj, glm::mat4 modelMatrix);
+  void drawObjectSkyBox(OGameObject& obj, glm::mat4 modelMatrix);
 
   public:
   OCamera camera;
@@ -50,5 +52,5 @@ class OGraphicsEngine: private OWindow
 
   GLFWwindow* getWindow();
 
-  void render(OGameObject& spaceship, OGameObject& sphere);
+  void render(OGameObject& spaceship, OGameObject& sphere, OGameObject& skybox);
 };

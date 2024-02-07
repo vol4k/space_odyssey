@@ -125,9 +125,63 @@ GLuint OResourceUnit::LoadTexture(std::string filename)
 	return id;
 }
 
+GLuint OResourceUnit::LoadCubeTexture(std::string foldername)
+{
+    std::string folderpath = "res/textures/" + foldername + '/';
+
+	GLuint id;
+	glGenTextures(1, &id);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, id);
+	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    BasePairMap cubemap;
+
+    cubemap["ft"] = GL_TEXTURE_CUBE_MAP_POSITIVE_X;
+    cubemap["bk"] = GL_TEXTURE_CUBE_MAP_NEGATIVE_X;
+    cubemap["up"] = GL_TEXTURE_CUBE_MAP_POSITIVE_Y;
+    cubemap["dn"] = GL_TEXTURE_CUBE_MAP_NEGATIVE_Y;
+    cubemap["rt"] = GL_TEXTURE_CUBE_MAP_POSITIVE_Z;
+    cubemap["lf"] = GL_TEXTURE_CUBE_MAP_NEGATIVE_Z;
+
+    int w, h;
+
+    for (const auto & entry : fs::directory_iterator(folderpath))
+    {
+        unsigned char* image = SOIL_load_image(entry.path().c_str(), &w, &h, 0, SOIL_LOAD_RGBA);
+
+        std::string filename = entry.path().filename().string();
+        int loc = filename.find_last_of('_');
+        
+        if (loc == std::string::npos) return - 1;
+        std::string key = filename.substr(loc+1, 2);
+
+        glTexImage2D(cubemap[key], 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+        
+        SOIL_free_image_data(image);
+    }
+
+	return id;
+}
+
 void OResourceUnit::SetActiveTexture(GLuint textureID, const char * shaderVariableName, GLuint programID, int textureUnit)
 {
 	glUniform1i(glGetUniformLocation(programID, shaderVariableName), textureUnit);
 	glActiveTexture(GL_TEXTURE0 + textureUnit);
 	glBindTexture(GL_TEXTURE_2D, textureID);
+}
+
+void OResourceUnit::SetActiveCubeTexture(GLuint textureID, const char * shaderVariableName, GLuint programID, int textureUnit)
+{
+	glUniform1i(glGetUniformLocation(programID, shaderVariableName), textureUnit);
+	glActiveTexture(GL_TEXTURE0 + textureUnit);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
 }

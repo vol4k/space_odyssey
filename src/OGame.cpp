@@ -19,6 +19,8 @@ OGame::OGame(int width=DEFAULT_WINDOW_WIDTH, int height=DEFAULT_WINDOW_HEIGHT)
 
 OGame::~OGame()
 {
+  delete skybox;
+  delete skyboxShader;
   delete spaceship;
   delete spaceshipShader;
   delete sphere;
@@ -89,14 +91,16 @@ void OGame::processInput()
 
 void OGame::renderScene()
 {
-	engine->render(*spaceship, *sphere);
+	engine->render(*spaceship, *sphere, *skybox);
 }
 
 void OGame::reloadShaders()
 {
+  delete skyboxShader;
   delete sphereShader;
   delete spaceshipShader;
 
+  skyboxShader = new OShaderUnit("skybox.vert", "skybox.frag");
   sphereShader = new OShaderUnit("default.vert", "default.frag");
   spaceshipShader = new OShaderUnit("default.vert", "default.frag");
 
@@ -108,8 +112,17 @@ void OGame::initResources()
 {
   try
   {
+    skyboxShader = new OShaderUnit("skybox.vert", "skybox.frag");
     sphereShader = new OShaderUnit("default.vert", "default.frag");
     spaceshipShader = new OShaderUnit("default.vert", "default.frag");
+
+    skybox = new OGameObject(
+      skyboxShader,
+      "cube.obj",
+      "skybox",
+      glm::vec3(0.f, 0.f, 0.f),
+      glm::vec3(-1.f, 0.f, 0.f)
+    );
 
     spaceship = new OGameObject(
       spaceshipShader,

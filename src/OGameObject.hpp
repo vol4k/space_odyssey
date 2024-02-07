@@ -6,6 +6,9 @@
 class OGameObject
 {
   public:
+  // for skybox object
+  OGameObject(OShaderUnit* shader, std::string modelfile, std::string texturefolder, glm::vec3 pos, glm::vec3 dir);
+  // for default object
   OGameObject(OShaderUnit* shader, std::string modelfile, std::string texturefile, std::string normalfile, glm::vec3 pos, glm::vec3 dir);
   ~OGameObject();
 
