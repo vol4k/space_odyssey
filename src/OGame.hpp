@@ -23,6 +23,7 @@ class OGame
   OGameObject* sphere;
 
   void processInput();
+  void reloadShaders();
   void renderScene();
   void initResources();
 };

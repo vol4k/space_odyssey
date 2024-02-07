@@ -9,6 +9,7 @@ class OGameObject
   OGameObject(OShaderUnit* shader, std::string modelfile, std::string texturefile, std::string normalfile, glm::vec3 pos, glm::vec3 dir);
   ~OGameObject();
 
+  void updateShader(OShaderUnit* shader);
   OResourceUnit::RenderContext& getContext();
   OShaderUnit& getShader();
 

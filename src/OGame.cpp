@@ -44,10 +44,13 @@ int OGame::run()
 
 void OGame::processInput()
 {
+  static bool lockShaders = false;
+
   GLFWwindow* window = engine->getWindow();
 
 	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceship->dir, glm::vec3(0.f, 1.f, 0.f)));
 	glm::vec3 spaceshipUp = glm::vec3(0.f, 1.f, 0.f);
+  glm::vec3 spaceshipPrevPos = spaceship->pos;
 	float angleSpeed = 0.05f;
 	float moveSpeed = 0.05f;
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
@@ -69,14 +72,36 @@ void OGame::processInput()
 		spaceship->dir = glm::vec3(glm::eulerAngleY(angleSpeed) * glm::vec4(spaceship->dir, 0));
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		spaceship->dir = glm::vec3(glm::eulerAngleY(-angleSpeed) * glm::vec4(spaceship->dir, 0));
+  if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
+    if(!lockShaders)
+      {
+      lockShaders = true;
+      reloadShaders();
+      }
+  else
+    lockShaders = false;
 
-	engine->cameraPos = spaceship->pos - 1.5 * spaceship->dir + glm::vec3(0, 1, 0) * 0.5f;
-	engine->cameraDir = spaceship->dir;
+  glm::vec3 deltaPos = spaceship->pos - spaceshipPrevPos;
+
+  engine->camera.SetCameraView(engine->camera.GetEye() + deltaPos, spaceship->pos, engine->camera.GetUpVector());
+	//engine->cameraDir = spaceship->dir;
 }
 
 void OGame::renderScene()
 {
 	engine->render(*spaceship, *sphere);
+}
+
+void OGame::reloadShaders()
+{
+  delete sphereShader;
+  delete spaceshipShader;
+
+  sphereShader = new OShaderUnit("default.vert", "default.frag");
+  spaceshipShader = new OShaderUnit("default.vert", "default.frag");
+
+  sphere->updateShader(sphereShader);
+  spaceship->updateShader(spaceshipShader);
 }
 
 void OGame::initResources()
@@ -87,11 +112,11 @@ void OGame::initResources()
     spaceshipShader = new OShaderUnit("default.vert", "default.frag");
 
     spaceship = new OGameObject(
-      spaceshipShader, 
+      spaceshipShader,
       "spaceship.obj",
       "spaceship.jpg",
       "spaceship_normal.jpg",
-      glm::vec3(0.f, 0.f, 0.f), 
+      glm::vec3(0.f, 0.f, 0.f),
       glm::vec3(-1.f, 0.f, 0.f)
     );
 

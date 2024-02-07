@@ -4,12 +4,18 @@ OGraphicsEngine::OGraphicsEngine()
 :OWindow(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT)
 {
   glewInit();
-  glViewport(0, 0, width, height);
-  aspectRatio = width / float(height);
+  glViewport(0, 0, viewportWidth, viewportHeight);
+  aspectRatio = viewportWidth / float(viewportHeight);
 
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
   glEnable(GL_DEPTH_TEST);
+
+	camera = OCamera(
+		/* eye */ glm::vec3(-2.0f,0.0f,0.0f), 
+		/* lookat */ glm::vec3(0.0f,0.0f,0.0f), 
+		/* upVector */ glm::vec3(0.0f,1.0f,0.0f)
+	);
 }
 
 OGraphicsEngine::~OGraphicsEngine()
@@ -27,6 +33,7 @@ void OGraphicsEngine::framebuffer_size_callback(GLFWwindow* window, int width, i
 	glViewport(0, 0, width, height);
 }
 
+/*
 glm::mat4 OGraphicsEngine::createCameraMatrix()
 {
 	glm::vec3 cameraSide = glm::normalize(glm::cross(cameraDir, glm::vec3(0.f,1.f,0.f)));
@@ -42,6 +49,7 @@ glm::mat4 OGraphicsEngine::createCameraMatrix()
 
 	return cameraMatrix;
 }
+*/
 
 glm::mat4 OGraphicsEngine::createPerspectiveMatrix()
 {
@@ -64,6 +72,50 @@ glm::mat4 OGraphicsEngine::createPerspectiveMatrix()
 	return perspectiveMatrix;
 }
 
+void OGraphicsEngine::updateCamera()
+{
+	double xPos, yPos;
+	int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+	glfwGetCursorPos(window, &xPos, &yPos);
+	if (state != GLFW_PRESS)
+	{
+		lastMousePos.x = xPos;
+		lastMousePos.y = yPos;
+	}
+
+	// Get the homogenous position of the camera and pivot point
+	glm::vec4 position(camera.GetEye().x, camera.GetEye().y, camera.GetEye().z, 1);
+	glm::vec4 pivot(camera.GetLookAt().x, camera.GetLookAt().y, camera.GetLookAt().z, 1);
+
+	// step 1 : Calculate the amount of rotation given the mouse movement.
+	float deltaAngleX = (2 * M_PI / viewportWidth); // a movement from left to right = 2*PI = 360 deg
+	float deltaAngleY = (M_PI / viewportHeight);  // a movement from top to bottom = PI = 180 deg
+	float xAngle = (lastMousePos.x - xPos) * deltaAngleX;
+	float yAngle = (lastMousePos.y - yPos) * deltaAngleY;
+
+	// Extra step to handle the problem when the camera direction is the same as the up vector
+	float cosAngle = dot(camera.GetViewDir(), camera.GetUpVector());
+	if (cosAngle * sgn(deltaAngleY) > 0.99f)
+			deltaAngleY = 0;
+
+	// step 2: Rotate the camera around the pivot point on the first axis.
+	glm::mat4 rotationMatrixX(1.0f);
+	rotationMatrixX = glm::rotate(rotationMatrixX, xAngle, camera.GetUpVector());
+	position = (rotationMatrixX * (position - pivot)) + pivot;
+
+	// step 3: Rotate the camera around the pivot point on the second axis.
+	glm::mat4x4 rotationMatrixY(1.0f);
+	rotationMatrixY = glm::rotate(rotationMatrixY, yAngle, camera.GetRightVector());
+	glm::vec3 finalPosition = (rotationMatrixY * (position - pivot)) + pivot;
+
+	// Update the camera view (we keep the same lookat and the same up vector)
+	camera.SetCameraView(finalPosition, camera.GetLookAt(), camera.GetUpVector());
+
+	// Update the mouse position for the next rotation
+	lastMousePos.x = xPos; 
+	lastMousePos.y = yPos;
+}
+
 void OGraphicsEngine::render(OGameObject& spaceship, OGameObject& sphere)
 {
   // init
@@ -73,6 +125,8 @@ void OGraphicsEngine::render(OGameObject& spaceship, OGameObject& sphere)
 	glUseProgram(spaceship.getShader().getProgram());
   
   // calculations
+	updateCamera();
+
   glm::mat4 transformation;
 	float time = glfwGetTime();
 
@@ -112,7 +166,7 @@ void OGraphicsEngine::drawObjectColor(OGameObject& obj, glm::mat4 modelMatrix, g
 {
   GLuint prog = obj.getShader().getProgram();
 	glUseProgram(prog);
-	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
+	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * camera.GetViewMatrix(); //createCameraMatrix();
 	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 	glUniformMatrix4fv(glGetUniformLocation(prog, "transformation"), 1, GL_FALSE, (float*)&transformation);
 	glUniformMatrix4fv(glGetUniformLocation(prog, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
@@ -127,7 +181,7 @@ void OGraphicsEngine::drawObjectProc(OGameObject& obj, glm::mat4 modelMatrix, gl
 	GLuint program = obj.getShader().getProgram();
 	glUseProgram(program);
 	OResourceUnit::SetActiveTexture(obj.texture, "colorTexture", program, 0);
-	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * createCameraMatrix();
+	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * camera.GetViewMatrix(); //createCameraMatrix();
 	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 	glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
 	glUniformMatrix4fv(glGetUniformLocation(program, "modelMat"), 1, GL_FALSE, (float*)&modelMatrix);
@@ -140,7 +194,7 @@ void OGraphicsEngine::drawObjectProc(OGameObject& obj, glm::mat4 modelMatrix, gl
 		reflectorColor.x, reflectorColor.y, reflectorColor.z);
 	glUniform1f(glGetUniformLocation(program, "reflectorLightExp"), reflectorLightExp);
 
-	glUniform3f(glGetUniformLocation(program, "cameraPos"), cameraPos.x, cameraPos.y, cameraPos.z);
+	glUniform3f(glGetUniformLocation(program, "cameraPos"), camera.GetEye().x, camera.GetEye().y, camera.GetEye().z);
 	
 	OResourceUnit::DrawContext(obj.getContext());
 	glUseProgram(0);

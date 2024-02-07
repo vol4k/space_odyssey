@@ -10,8 +10,8 @@
 class OWindow
 {
   protected:
-  int width;
-  int height;
+  int viewportWidth;
+  int viewportHeight;
 
   float aspectRatio = 1.f;
   GLFWwindow* window;

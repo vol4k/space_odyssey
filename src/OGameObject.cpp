@@ -13,6 +13,11 @@ OGameObject::~OGameObject()
   delete context;
 }
 
+void OGameObject::updateShader(OShaderUnit* shader)
+{
+  this->shader = shader;
+}
+
 OResourceUnit::RenderContext& OGameObject::getContext()
 {
   return *context;

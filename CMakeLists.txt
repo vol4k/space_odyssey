@@ -14,6 +14,7 @@ set(SOURCES
   ${SRC_DIR}/OResourceUnit.cpp
   ${SRC_DIR}/OShaderUnit.cpp
   ${SRC_DIR}/OGameObject.cpp
+  ${SRC_DIR}/OCamera.cpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

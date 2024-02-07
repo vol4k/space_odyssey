@@ -2,8 +2,8 @@
 
 OWindow::OWindow(int width=DEFAULT_WINDOW_WIDTH, int height=DEFAULT_WINDOW_HEIGHT)
 {
-  this->width=width;
-  this->height=height;
+  viewportWidth=width;
+  viewportHeight=height;
 
   // glfw initialization
   glfwInit();
@@ -17,7 +17,7 @@ OWindow::OWindow(int width=DEFAULT_WINDOW_WIDTH, int height=DEFAULT_WINDOW_HEIGH
 
 
   // create window using glfw
-  window = glfwCreateWindow(width, height, WINDOW_TITLE, NULL, NULL);
+  window = glfwCreateWindow(viewportWidth, viewportHeight, WINDOW_TITLE, NULL, NULL);
   if (window == NULL)
   {
     glfwTerminate();
