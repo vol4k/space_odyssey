@@ -42,12 +42,14 @@ bash ./run.sh
   - [x] shaderLoader
   - [x] textureLoader
   - [x] modelLoader
-  - [ ] Quaternions
+  - [x] Arcball Camera
+  - [ ] Quaternions (Gimbal lock)
   - [ ] Normal mapping
   - [ ] Physics-based rendering (PBR)
   - [ ] Bloom
   - [ ] Parallel transport frames
   - [x] SkyBox
+  - [ ] 3D Clouds
   - [ ] ...
 
 - [ ] project storyline
