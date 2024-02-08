@@ -172,6 +172,73 @@ GLuint OResourceUnit::LoadCubeTexture(std::string foldername)
 	return id;
 }
 
+GLuint OResourceUnit::createPerlinNoiseTexture() {
+    int w = 512;
+    int h = 512;
+
+    unsigned char* pixels = new unsigned char[w * h * 4];
+
+
+    const int GRID_SIZE = 400;
+
+
+    for (int x = 0; x < w; x++)
+    {
+        for (int y = 0; y < h; y++)
+        {
+            int index = (y * w + x) * 4;
+
+
+            float val = 0;
+
+            float freq = 1;
+            float amp = 1;
+
+            for (int i = 0; i < 12; i++)
+            {
+                val += glm::perlin(glm::vec2(x * freq / GRID_SIZE, y * freq / GRID_SIZE)) * amp;
+
+                freq *= 2;
+                amp /= 2;
+
+            }
+
+            // Contrast
+            val *= 1.2;
+
+            // Clipping
+            if (val > 1.0f)
+                val = 1.0f;
+            else if (val < -1.0f)
+                val = -1.0f;
+
+            // Convert 1 to -1 into 255 to 0
+            int color = (int)(((val + 1.0f) * 0.5f) * 255);
+
+            // Set pixel color
+            pixels[index] = color;
+            pixels[index + 1] = color;
+            pixels[index + 2] = color;
+            pixels[index + 3] = 255;
+        }
+    }
+
+    GLuint id;
+	glGenTextures(1, &id);
+	glBindTexture(GL_TEXTURE_2D, id);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, w, h, 0, GL_RED, GL_FLOAT, pixels);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+    delete[] pixels;
+
+    return id;
+}
+
 void OResourceUnit::SetActiveTexture(GLuint textureID, const char * shaderVariableName, GLuint programID, int textureUnit)
 {
 	glUniform1i(glGetUniformLocation(programID, shaderVariableName), textureUnit);

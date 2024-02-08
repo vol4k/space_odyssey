@@ -7,6 +7,7 @@
 #include <assimp/scene.h>
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
+#include <glm/gtc/noise.hpp>
 #include <map>
 #include <filesystem>
 namespace fs = std::filesystem;
@@ -31,6 +32,7 @@ namespace OResourceUnit
 
 	GLuint LoadTexture(std::string filename);
 	GLuint LoadCubeTexture(std::string foldername);
+	GLuint createPerlinNoiseTexture();
 
 	// textureID - texture ID obtained from the LoadTexture function
 	// shaderVariableName - name of the 'sampler2D' type variable in the shader to which the texture is to be associated

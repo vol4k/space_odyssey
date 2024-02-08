@@ -47,7 +47,7 @@ bash ./run.sh
   - [ ] Physics-based rendering (PBR)
   - [ ] Bloom
   - [ ] Parallel transport frames
-  - [ ] SkyBox
+  - [x] SkyBox
   - [ ] ...
 
 - [ ] project storyline

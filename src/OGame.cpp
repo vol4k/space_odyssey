@@ -19,13 +19,19 @@ OGame::OGame(int width=DEFAULT_WINDOW_WIDTH, int height=DEFAULT_WINDOW_HEIGHT)
 
 OGame::~OGame()
 {
+  delete cloud;
+  delete cloudShader;
+  delete sun;
+  delete sunShader;
   delete skybox;
   delete skyboxShader;
   delete spaceship;
   delete spaceshipShader;
-  delete sphere;
   delete sphereShader;
   delete engine;
+
+  for(auto planet : planetStore.planets)
+    delete planet;
 }
 
 int OGame::run()
@@ -55,21 +61,24 @@ void OGame::processInput()
   glm::vec3 spaceshipPrevPos = spaceship->pos;
 	float angleSpeed = 0.05f;
 	float moveSpeed = 0.05f;
+
+  spaceship->pos += spaceship->dir * acceleration;
+
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, true);
 	}
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		spaceship->pos += spaceship->dir * moveSpeed;
+		acceleration += moveSpeed/100;
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		spaceship->pos -= spaceship->dir * moveSpeed;
-	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
-		spaceship->pos += spaceshipSide * moveSpeed;
-	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
-		spaceship->pos -= spaceshipSide * moveSpeed;
-	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-		spaceship->pos += spaceshipUp * moveSpeed;
-	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-		spaceship->pos -= spaceshipUp * moveSpeed;
+		acceleration -= moveSpeed/100;
+	//if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+	//	spaceship->pos += spaceshipSide * moveSpeed;
+	//if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+	//	spaceship->pos -= spaceshipSide * moveSpeed;
+	//if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+	//	spaceship->pos += spaceshipUp * moveSpeed;
+	//if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+	//	spaceship->pos -= spaceshipUp * moveSpeed;
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 		spaceship->dir = glm::vec3(glm::eulerAngleY(angleSpeed) * glm::vec4(spaceship->dir, 0));
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
@@ -83,35 +92,47 @@ void OGame::processInput()
   else
     lockShaders = false;
 
-  glm::vec3 deltaPos = spaceship->pos - spaceshipPrevPos;
+  acceleration -= moveSpeed/5000;
+  if (acceleration < 0) acceleration = 0;
 
+  glm::vec3 deltaPos = spaceship->pos - spaceshipPrevPos;
   engine->camera.SetCameraView(engine->camera.GetEye() + deltaPos, spaceship->pos, engine->camera.GetUpVector());
-	//engine->cameraDir = spaceship->dir;
 }
 
 void OGame::renderScene()
 {
-	engine->render(*spaceship, *sphere, *skybox);
+	engine->render(*spaceship, planetStore, *sun, *skybox, *cloud);
 }
 
 void OGame::reloadShaders()
 {
+  delete cloudShader;
+  delete sunShader;
   delete skyboxShader;
   delete sphereShader;
   delete spaceshipShader;
 
+  cloudShader = new OShaderUnit("default.vert", "cloud.frag");
+  sunShader = new OShaderUnit("sun.vert", "sun.frag");
   skyboxShader = new OShaderUnit("skybox.vert", "skybox.frag");
   sphereShader = new OShaderUnit("default.vert", "default.frag");
   spaceshipShader = new OShaderUnit("default.vert", "default.frag");
 
-  sphere->updateShader(sphereShader);
+  cloud->updateShader(cloudShader);
+  sun->updateShader(sunShader);
+  skybox->updateShader(skyboxShader);
   spaceship->updateShader(spaceshipShader);
+
+  for(auto planet : planetStore.planets)
+    planet->updateShader(sphereShader);
 }
 
 void OGame::initResources()
 {
   try
   {
+    cloudShader = new OShaderUnit("default.vert", "cloud.frag");
+    sunShader = new OShaderUnit("sun.vert", "sun.frag");
     skyboxShader = new OShaderUnit("skybox.vert", "skybox.frag");
     sphereShader = new OShaderUnit("default.vert", "default.frag");
     spaceshipShader = new OShaderUnit("default.vert", "default.frag");
@@ -129,18 +150,127 @@ void OGame::initResources()
       "spaceship.obj",
       "spaceship.jpg",
       "spaceship_normal.jpg",
-      glm::vec3(0.f, 0.f, 0.f),
+      glm::vec3(-2.f, -0.8f, 0.f),
       glm::vec3(-1.f, 0.f, 0.f)
     );
 
-    sphere = new OGameObject(
+    sun = new OGameObject(
+      sunShader, 
+      "sphere.obj",
+      "sun.jpg",
+      "sun_normal.jpg",
+      glm::vec3(0.f, 0.f, 0.f), 
+      glm::vec3(1.f, 0.f, 0.f),
+      50.f,
+      1.5f
+    );
+
+    // planets
+
+    planetStore.planet.mercury = new OGameObject(
+      sphereShader, 
+      "sphere.obj",
+      "mercury.jpg",
+      "earth_normal.png",
+      glm::vec3(-3.f, -1.f, 0.f), 
+      glm::vec3(1.f, 0.f, 0.f),
+      rand()%50+25,
+      0.16f
+    );
+    planetStore.planet.venus = new OGameObject(
+      sphereShader, 
+      "sphere.obj",
+      "venus.jpg",
+      "earth_normal.png",
+      glm::vec3(-8.f, -1.f, 0.f), 
+      glm::vec3(1.f, 0.f, 0.f),
+      rand()%50+25,
+      0.32f
+    );
+    planetStore.planet.earth = new OGameObject(
       sphereShader, 
       "sphere.obj",
       "earth.png",
       "earth_normal.png",
-      glm::vec3(-4.f, 0.f, 0.f), 
-      glm::vec3(1.f, 0.f, 0.f)
+      glm::vec3(-10.f, -1.f, 0.f), 
+      glm::vec3(1.f, 0.f, 0.f),
+      rand()%50+25,
+      0.4f
     );
+    planetStore.planet.mars = new OGameObject(
+      sphereShader, 
+      "sphere.obj",
+      "mars.jpg",
+      "earth_normal.png",
+      glm::vec3(-12.f, -1.f, 0.f), 
+      glm::vec3(1.f, 0.f, 0.f),
+      rand()%50+25,
+      0.32f
+    );
+
+    float goal_deceleration = rand()%50+25;
+    planetStore.planet.jupiter = new OGameObject(
+      sphereShader, 
+      "sphere.obj",
+      "jupiter.jpg",
+      "earth_normal.png",
+      glm::vec3(-14.f, -1.f, 0.f), 
+      glm::vec3(1.f, 0.f, 0.f),
+      goal_deceleration,
+      0.8f
+    );
+    cloud = new OGameObject(
+      cloudShader,
+      "sphere.obj",
+      "cloud.jpg",
+      "earth_normal.png",
+      glm::vec3(-14.f, -1.f, 0.f), 
+      glm::vec3(1.f, 0.f, 0.f),
+      goal_deceleration,
+      0.79f
+    );
+
+    planetStore.planet.saturn = new OGameObject(
+      sphereShader, 
+      "sphere.obj",
+      "saturn.jpg",
+      "earth_normal.png",
+      glm::vec3(-16.f, -1.f, 0.f), 
+      glm::vec3(1.f, 0.f, 0.f),
+      rand()%50+25,
+      0.48f
+    );
+    planetStore.planet.uranus = new OGameObject(
+      sphereShader, 
+      "sphere.obj",
+      "uranus.jpg",
+      "earth_normal.png",
+      glm::vec3(-18.f, -1.f, 0.f), 
+      glm::vec3(1.f, 0.f, 0.f),
+      rand()%50+25,
+      0.48f
+    );
+    planetStore.planet.neptune = new OGameObject(
+      sphereShader, 
+      "sphere.obj",
+      "neptune.jpg",
+      "earth_normal.png",
+      glm::vec3(-20.f, -1.f, 0.f), 
+      glm::vec3(1.f, 0.f, 0.f),
+      rand()%50+25,
+      0.4f
+    );
+    planetStore.planet.pluto = new OGameObject(
+      sphereShader, 
+      "sphere.obj",
+      "pluto.jpg",
+      "earth_normal.png",
+      glm::vec3(-22.f, -1.f, 0.f), 
+      glm::vec3(1.f, 0.f, 0.f),
+      rand()%50+25,
+      0.08f
+    );
+    
   }
   catch(const std::exception& e)
   {

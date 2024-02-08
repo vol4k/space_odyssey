@@ -10,6 +10,21 @@
 #include <glm/gtx/euler_angles.hpp>
 #include <math.h>
 
+union spheres {
+    struct {
+      OGameObject* mercury;
+      OGameObject* venus;
+      OGameObject* earth;
+      OGameObject* mars;
+      OGameObject* jupiter;
+      OGameObject* saturn;
+      OGameObject* uranus;
+      OGameObject* neptune;
+      OGameObject* pluto;
+    } planet;
+    OGameObject* planets[9];
+  };
+
 template <typename t> int sgn(t val) {
     return (t(0) < val) - (val < t(0));
 }
@@ -30,7 +45,7 @@ class OGraphicsEngine: private OWindow
   
   glm::vec3 reflectorColor = glm::vec3(0.3f, 0.f, 0.f);
   float reflectorAngle = glm::radians(25.f);
-  float reflectorLightExp = 5;
+  float reflectorLightExp = 500;
 
   glm::vec2 lastMousePos = glm::vec2();
   glm::vec3 upVector; // Orientation of the camera
@@ -52,5 +67,5 @@ class OGraphicsEngine: private OWindow
 
   GLFWwindow* getWindow();
 
-  void render(OGameObject& spaceship, OGameObject& sphere, OGameObject& skybox);
+  void render(OGameObject& spaceship, spheres planetStore, OGameObject& sun, OGameObject& skybox, OGameObject& cloud);
 };

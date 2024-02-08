@@ -9,11 +9,9 @@ OGraphicsEngine::OGraphicsEngine()
 
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-  glEnable(GL_DEPTH_TEST);
-
 	camera = OCamera(
-		/* eye */ glm::vec3(2.0f,0.0f,0.0f), 
-		/* lookat */ glm::vec3(0.0f,0.0f,0.0f), 
+		/* eye */ glm::vec3(-1.8f,-0.7f,0.0f), 
+		/* lookat */ glm::vec3(-2.0f,0.0f,0.0f), 
 		/* upVector */ glm::vec3(0.0f,1.0f,0.0f)
 	);
 }
@@ -98,16 +96,14 @@ void OGraphicsEngine::updateCamera()
 	lastMousePos.y = yPos;
 }
 
-void OGraphicsEngine::render(OGameObject& spaceship, OGameObject& sphere, OGameObject& skybox)
+void OGraphicsEngine::render(OGameObject& spaceship, spheres planetStore, OGameObject& sun, OGameObject& skybox, OGameObject& cloud)
 {
   // init
-	//glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   // calculations
 	updateCamera();
 
-  glm::mat4 transformation;
 	float time = glfwGetTime();
 
 	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceship.dir, glm::vec3(0.f, 1.f, 0.f)));
@@ -125,6 +121,13 @@ void OGraphicsEngine::render(OGameObject& spaceship, OGameObject& sphere, OGameO
     	glm::translate(glm::mat4(1.f), spaceship.pos) * 
       glm::scale(glm::mat4(1.f), glm::vec3(1.f))
 	);
+	glEnable(GL_DEPTH_TEST);
+
+	// draw cloud
+	drawObjectProc(
+    cloud,
+		cloud.getModelMatrix(time)
+	);
 
 	// draw objects
 	drawObjectProc(
@@ -132,13 +135,18 @@ void OGraphicsEngine::render(OGameObject& spaceship, OGameObject& sphere, OGameO
 			glm::translate(glm::mat4(1.f), spaceship.pos) * 
 			specshipCameraRotrationMatrix * 
       glm::eulerAngleY(glm::pi<float>()) * 
-      glm::scale(glm::mat4(1.f), glm::vec3(0.1))
+      glm::scale(glm::mat4(1.f), glm::vec3(0.01))
 	);
 
+	for(auto planet:planetStore.planets)
+		drawObjectProc(
+			*planet,
+			planet->getModelMatrix(time)
+		);
+
 	drawObjectProc(
-    sphere,
-    	glm::translate(glm::mat4(1.f), sphere.pos) * 
-      glm::scale(glm::mat4(1.f), glm::vec3(0.5))
+    sun,
+    sun.getModelMatrix(time)
 	);
 
 	glfwSwapBuffers(window);
@@ -160,7 +168,7 @@ void OGraphicsEngine::drawObjectColor(OGameObject& obj, glm::mat4 modelMatrix, g
 }
 
 void OGraphicsEngine::drawObjectProc(OGameObject& obj, glm::mat4 modelMatrix) {
-	GLuint program = obj.getShader().getProgram();;
+	GLuint program = obj.getShader().getProgram();
 	glUseProgram(program);
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * camera.GetViewMatrix();
 	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
@@ -174,7 +182,7 @@ void OGraphicsEngine::drawObjectProc(OGameObject& obj, glm::mat4 modelMatrix) {
 }
 
 void OGraphicsEngine::drawObjectSkyBox(OGameObject& obj, glm::mat4 modelMatrix) {
-	GLuint program = obj.getShader().getProgram();;
+	GLuint program = obj.getShader().getProgram();
 	glUseProgram(program);
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * camera.GetViewMatrix();
 	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
