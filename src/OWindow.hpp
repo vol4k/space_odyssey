@@ -4,8 +4,8 @@
 #include <GLFW/glfw3.h>
 
 #define WINDOW_TITLE "Space Odysey"
-#define DEFAULT_WINDOW_WIDTH 800
-#define DEFAULT_WINDOW_HEIGHT 600
+#define DEFAULT_WINDOW_WIDTH 1280
+#define DEFAULT_WINDOW_HEIGHT 720
 
 class OWindow
 {

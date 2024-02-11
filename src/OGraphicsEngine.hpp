@@ -67,5 +67,5 @@ class OGraphicsEngine: private OWindow
 
   GLFWwindow* getWindow();
 
-  void render(OGameObject& spaceship, spheres planetStore, OGameObject& sun, OGameObject& skybox, OGameObject& cloud);
+  void render(OGameObject& spaceship, spheres planetStore, OGameObject& sun, OGameObject& skybox);
 };

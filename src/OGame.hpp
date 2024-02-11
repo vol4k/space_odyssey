@@ -15,13 +15,11 @@ class OGame
   bool is_ok;
   OGraphicsEngine* engine;
 
-  OShaderUnit* cloudShader;
   OShaderUnit* sunShader;
   OShaderUnit* skyboxShader;
   OShaderUnit* spaceshipShader;
   OShaderUnit* sphereShader;
-  
-  OGameObject* cloud;
+
   OGameObject* sun;
   OGameObject* skybox;
   OGameObject* spaceship;

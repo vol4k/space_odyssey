@@ -44,7 +44,7 @@ bash ./run.sh
   - [x] modelLoader
   - [x] Arcball Camera
   - [ ] Quaternions (Gimbal lock)
-  - [ ] Normal mapping
+  - [x] Normal mapping
   - [ ] Physics-based rendering (PBR)
   - [ ] Bloom
   - [ ] Parallel transport frames

@@ -19,8 +19,6 @@ OGame::OGame(int width=DEFAULT_WINDOW_WIDTH, int height=DEFAULT_WINDOW_HEIGHT)
 
 OGame::~OGame()
 {
-  delete cloud;
-  delete cloudShader;
   delete sun;
   delete sunShader;
   delete skybox;
@@ -29,7 +27,7 @@ OGame::~OGame()
   delete spaceshipShader;
   delete sphereShader;
   delete engine;
-
+  
   for(auto planet : planetStore.planets)
     delete planet;
 }
@@ -53,6 +51,7 @@ int OGame::run()
 void OGame::processInput()
 {
   static bool lockShaders = false;
+  static bool mouseControl = false;
 
   GLFWwindow* window = engine->getWindow();
 
@@ -83,6 +82,9 @@ void OGame::processInput()
 		spaceship->dir = glm::vec3(glm::eulerAngleY(angleSpeed) * glm::vec4(spaceship->dir, 0));
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		spaceship->dir = glm::vec3(glm::eulerAngleY(-angleSpeed) * glm::vec4(spaceship->dir, 0));
+  if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+    if(!mouseControl) mouseControl = true;
+    else mouseControl = false;
   if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS)
     if(!lockShaders)
       {
@@ -91,6 +93,9 @@ void OGame::processInput()
       }
   else
     lockShaders = false;
+
+  if(mouseControl)
+    spaceship->dir = engine->camera.GetViewDir() + glm::vec3(0.f,0.2f,0.f);
 
   acceleration -= moveSpeed/5000;
   if (acceleration < 0) acceleration = 0;
@@ -101,37 +106,33 @@ void OGame::processInput()
 
 void OGame::renderScene()
 {
-	engine->render(*spaceship, planetStore, *sun, *skybox, *cloud);
+	engine->render(*spaceship, planetStore, *sun, *skybox);
 }
 
 void OGame::reloadShaders()
 {
-  delete cloudShader;
   delete sunShader;
   delete skyboxShader;
   delete sphereShader;
   delete spaceshipShader;
 
-  cloudShader = new OShaderUnit("default.vert", "cloud.frag");
   sunShader = new OShaderUnit("sun.vert", "sun.frag");
   skyboxShader = new OShaderUnit("skybox.vert", "skybox.frag");
   sphereShader = new OShaderUnit("default.vert", "default.frag");
   spaceshipShader = new OShaderUnit("default.vert", "default.frag");
 
-  cloud->updateShader(cloudShader);
   sun->updateShader(sunShader);
   skybox->updateShader(skyboxShader);
   spaceship->updateShader(spaceshipShader);
 
   for(auto planet : planetStore.planets)
-    planet->updateShader(sphereShader);
+    planet->updateShader(sphereShader);    
 }
 
 void OGame::initResources()
 {
   try
   {
-    cloudShader = new OShaderUnit("default.vert", "cloud.frag");
     sunShader = new OShaderUnit("sun.vert", "sun.frag");
     skyboxShader = new OShaderUnit("skybox.vert", "skybox.frag");
     sphereShader = new OShaderUnit("default.vert", "default.frag");
@@ -208,7 +209,6 @@ void OGame::initResources()
       0.32f
     );
 
-    float goal_deceleration = rand()%50+25;
     planetStore.planet.jupiter = new OGameObject(
       sphereShader, 
       "sphere.obj",
@@ -216,18 +216,8 @@ void OGame::initResources()
       "earth_normal.png",
       glm::vec3(-14.f, -1.f, 0.f), 
       glm::vec3(1.f, 0.f, 0.f),
-      goal_deceleration,
+      rand()%50+25,
       0.8f
-    );
-    cloud = new OGameObject(
-      cloudShader,
-      "sphere.obj",
-      "cloud.jpg",
-      "earth_normal.png",
-      glm::vec3(-14.f, -1.f, 0.f), 
-      glm::vec3(1.f, 0.f, 0.f),
-      goal_deceleration,
-      0.79f
     );
 
     planetStore.planet.saturn = new OGameObject(

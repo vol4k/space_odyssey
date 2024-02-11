@@ -10,8 +10,8 @@ OGraphicsEngine::OGraphicsEngine()
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	camera = OCamera(
-		/* eye */ glm::vec3(-1.8f,-0.7f,0.0f), 
-		/* lookat */ glm::vec3(-2.0f,0.0f,0.0f), 
+		/* eye */ glm::vec3(-1.8f,-0.7f,0.0f),
+		/* lookat */ glm::vec3(-2.0f,0.0f,0.0f),
 		/* upVector */ glm::vec3(0.0f,1.0f,0.0f)
 	);
 }
@@ -96,7 +96,7 @@ void OGraphicsEngine::updateCamera()
 	lastMousePos.y = yPos;
 }
 
-void OGraphicsEngine::render(OGameObject& spaceship, spheres planetStore, OGameObject& sun, OGameObject& skybox, OGameObject& cloud)
+void OGraphicsEngine::render(OGameObject& spaceship, spheres planetStore, OGameObject& sun, OGameObject& skybox)
 {
   // init
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -118,16 +118,11 @@ void OGraphicsEngine::render(OGameObject& spaceship, spheres planetStore, OGameO
   // draw skybox
 	drawObjectSkyBox(
     skybox,
-    	glm::translate(glm::mat4(1.f), spaceship.pos) * 
+    	glm::translate(glm::mat4(1.f), spaceship.pos) *
+			glm::eulerAngleY(time / 50) * 
       glm::scale(glm::mat4(1.f), glm::vec3(1.f))
 	);
 	glEnable(GL_DEPTH_TEST);
-
-	// draw cloud
-	drawObjectProc(
-    cloud,
-		cloud.getModelMatrix(time)
-	);
 
 	// draw objects
 	drawObjectProc(
@@ -164,7 +159,6 @@ void OGraphicsEngine::drawObjectColor(OGameObject& obj, glm::mat4 modelMatrix, g
 	glUniform3f(glGetUniformLocation(prog, "lightPos"), 0,0,0);
 	OResourceUnit::DrawContext(obj.getContext());
 	glUseProgram(0);
-
 }
 
 void OGraphicsEngine::drawObjectProc(OGameObject& obj, glm::mat4 modelMatrix) {
@@ -176,6 +170,7 @@ void OGraphicsEngine::drawObjectProc(OGameObject& obj, glm::mat4 modelMatrix) {
 	glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
 	glUniform3f(glGetUniformLocation(program, "lightPos"), 0, 0, 0);
 	OResourceUnit::SetActiveTexture(obj.texture, "colorTexture", program, 0);
+	OResourceUnit::SetActiveTexture(obj.normal, "normalSampler", program, 1);
 	OResourceUnit::DrawContext(obj.getContext());
 
 	glUseProgram(0);
