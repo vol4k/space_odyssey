@@ -8,7 +8,7 @@ OCamera::OCamera(glm::vec3 eye, glm::vec3 lookat, glm::vec3 upVector)
   UpdateViewMatrix();
 }
 
-glm::mat4x4 OCamera::GetViewMatrix() const { return m_viewMatrix;  }
+glm::mat4 OCamera::GetViewMatrix() const { return m_viewMatrix;  }
 glm::vec3 OCamera::GetEye() const { return m_eye; }
 glm::vec3 OCamera::GetUpVector() const { return m_upVector; }
 glm::vec3 OCamera::GetLookAt() const { return m_lookAt; }

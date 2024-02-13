@@ -1,7 +1,7 @@
 #include "OGameObject.hpp"
 
 OGameObject::OGameObject(OShaderUnit* shader, std::string modelfile, std::string texturefile, std::string normalfile, glm::vec3 pos, glm::vec3 dir, float deceleration, float scale) 
-:shader(shader) ,context(new OResourceUnit::RenderContext()) ,pos(pos) ,dir(dir), deceleration(deceleration), scale(scale)
+:shader(shader) ,context(new OResourceUnit::RenderContext()) ,pos(pos) ,dir(dir), deceleration(deceleration), scale(scale), up(glm::vec3(0.f, 1.f, 0.f)), side(glm::vec3(0.f, 1.f, 0.f))
 {
   OResourceUnit::loadModelToContext(modelfile, *context);
   texture = OResourceUnit::LoadTexture(texturefile);
@@ -9,17 +9,10 @@ OGameObject::OGameObject(OShaderUnit* shader, std::string modelfile, std::string
 }
 
 OGameObject::OGameObject(OShaderUnit* shader, std::string modelfile, std::string texturefolder, glm::vec3 pos, glm::vec3 dir) 
-:shader(shader) ,context(new OResourceUnit::RenderContext()) ,pos(pos) ,dir(dir) 
+:shader(shader) ,context(new OResourceUnit::RenderContext()) ,pos(pos) ,dir(dir), up(glm::vec3(0.f, 1.f, 0.f)), side(glm::vec3(0.f, 1.f, 0.f))
 {
   OResourceUnit::loadModelToContext(modelfile, *context);
   texture = OResourceUnit::LoadCubeTexture(texturefolder);
-}
-
-OGameObject::OGameObject(OShaderUnit* shader, std::string modelfile, glm::vec3 pos, glm::vec3 dir, float deceleration, float scale)
-:shader(shader) ,context(new OResourceUnit::RenderContext()) ,pos(pos) ,dir(dir) 
-{
-  OResourceUnit::loadModelToContext(modelfile, *context);
-  texture = OResourceUnit::createPerlinNoiseTexture();
 }
 
 OGameObject::~OGameObject() 

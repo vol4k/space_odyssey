@@ -38,22 +38,9 @@ bash ./run.sh
   - [x] `Assimp`    <br>_is a cross-platform 3D model import library which aims to provide a common application programming interface (API) for different 3D asset file formats._
   - [x] `SOIL2`     <br>_is a tiny C library used primarily for uploading textures into OpenGL._
 
-- [ ] project features
-  - [x] shaderLoader
-  - [x] textureLoader
-  - [x] modelLoader
+- [x] project features
   - [x] Arcball Camera
-  - [ ] Quaternions (Gimbal lock)
+  - [x] Quaternions (Gimbal lock)
   - [x] Normal mapping
-  - [ ] Physics-based rendering (PBR)
-  - [ ] Bloom
-  - [ ] Parallel transport frames
+  - [x] Physics-based rendering (PBR)
   - [x] SkyBox
-  - [ ] 3D Clouds
-  - [ ] ...
-
-- [ ] project storyline
-  - [ ] ...
-
-- [ ] project description
-  - [ ] ...

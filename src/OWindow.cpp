@@ -24,6 +24,7 @@ OWindow::OWindow(int width=DEFAULT_WINDOW_WIDTH, int height=DEFAULT_WINDOW_HEIGH
     throw std::runtime_error("Failed to create GLFW window");
   }
   glfwMakeContextCurrent(window);
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
 OWindow::~OWindow()

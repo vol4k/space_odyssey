@@ -10,13 +10,12 @@
 class OWindow
 {
   protected:
-  int viewportWidth;
-  int viewportHeight;
-
-  float aspectRatio = 1.f;
   GLFWwindow* window;
   
   public:
+  int viewportWidth;
+  int viewportHeight;
+  
   OWindow(int width, int height);
   ~OWindow();
   bool windowShouldClose();

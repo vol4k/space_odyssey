@@ -4,8 +4,11 @@ OGraphicsEngine::OGraphicsEngine()
 :OWindow(DEFAULT_WINDOW_WIDTH, DEFAULT_WINDOW_HEIGHT)
 {
   glewInit();
+
+	viewportWidth = DEFAULT_WINDOW_WIDTH;
+	viewportHeight = DEFAULT_WINDOW_HEIGHT;
+
   glViewport(0, 0, viewportWidth, viewportHeight);
-  aspectRatio = viewportWidth / float(viewportHeight);
 
   glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -16,11 +19,6 @@ OGraphicsEngine::OGraphicsEngine()
 	);
 }
 
-OGraphicsEngine::~OGraphicsEngine()
-{
-  // TODO
-}
-
 GLFWwindow* OGraphicsEngine::getWindow()
 {
 	return window;
@@ -28,40 +26,22 @@ GLFWwindow* OGraphicsEngine::getWindow()
 
 void OGraphicsEngine::framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
+	glfwGetWindowSize(window, &width, &height);
 	glViewport(0, 0, width, height);
 }
 
 glm::mat4 OGraphicsEngine::createPerspectiveMatrix()
 {
+	glfwGetWindowSize(window, &viewportWidth, &viewportHeight);
+	glm::mat4 perspective = glm::perspectiveFov(fov, (float)viewportWidth, (float)viewportHeight, 0.1f, 1000.f);
 	
-	glm::mat4 perspectiveMatrix;
-	float n = 0.05;
-	float f = 20.;
-	float a1 = glm::min(aspectRatio, 1.f);
-	float a2 = glm::min(1 / aspectRatio, 1.f);
-	perspectiveMatrix = glm::mat4({
-		1,0.,0.,0.,
-		0.,aspectRatio,0.,0.,
-		0.,0.,(f+n) / (n - f),2*f * n / (n - f),
-		0.,0.,-1.,0.,
-		});
-
-	
-	perspectiveMatrix=glm::transpose(perspectiveMatrix);
-
-	return perspectiveMatrix;
+	return perspective;
 }
 
 void OGraphicsEngine::updateCamera()
 {	
 	double xPos, yPos;
-	int state = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
 	glfwGetCursorPos(window, &xPos, &yPos);
-	if (state != GLFW_PRESS)
-	{
-		lastMousePos.x = xPos;
-		lastMousePos.y = yPos;
-	}
 
 	// Get the homogenous position of the camera and pivot point
 	glm::vec4 position(camera.GetEye().x, camera.GetEye().y, camera.GetEye().z, 1);
@@ -92,8 +72,9 @@ void OGraphicsEngine::updateCamera()
 	camera.SetCameraView(finalPosition, camera.GetLookAt(), camera.GetUpVector());
 
 	// Update the mouse position for the next rotation
-	lastMousePos.x = xPos; 
-	lastMousePos.y = yPos;
+	glfwSetCursorPos(window, viewportWidth/2, viewportHeight/2);
+	lastMousePos.x = viewportWidth/2;
+	lastMousePos.y = viewportHeight/2;
 }
 
 void OGraphicsEngine::render(OGameObject& spaceship, spheres planetStore, OGameObject& sun, OGameObject& skybox)
@@ -103,85 +84,100 @@ void OGraphicsEngine::render(OGameObject& spaceship, spheres planetStore, OGameO
 
   // calculations
 	updateCamera();
+	camera.UpdateViewMatrix();
 
 	float time = glfwGetTime();
 
-	glm::vec3 spaceshipSide = glm::normalize(glm::cross(spaceship.dir, glm::vec3(0.f, 1.f, 0.f)));
-	glm::vec3 spaceshipUp = glm::normalize(glm::cross(spaceshipSide, spaceship.dir));
-	glm::mat4 specshipCameraRotrationMatrix = glm::mat4({
-		spaceshipSide.x,spaceshipSide.y,spaceshipSide.z,0,
-		spaceshipUp.x,spaceshipUp.y,spaceshipUp.z ,0,
-		-spaceship.dir.x,-spaceship.dir.y,-spaceship.dir.z,0,
-		0.,0.,0.,1.,
-		});
+	spaceship.side = glm::normalize(glm::cross(spaceship.dir, spaceship.up));
+
+	glm::mat4 spaceshipCameraRotationMatrix = glm::mat4(
+    glm::vec4(spaceship.side, 0),
+    glm::vec4(spaceship.up, 0),
+    glm::vec4(-spaceship.dir, 0),
+    glm::vec4(0, 0, 0, 1)
+);
+
+	spotlightPos = spaceship.pos + 0.2 * spaceship.dir;
+	spotlightConeDir = spaceship.dir;
 
   // draw skybox
+	glDisable(GL_DEPTH_TEST);
 	drawObjectSkyBox(
     skybox,
     	glm::translate(glm::mat4(1.f), spaceship.pos) *
 			glm::eulerAngleY(time / 50) * 
-      glm::scale(glm::mat4(1.f), glm::vec3(1.f))
+      glm::scale(glm::mat4(1.f), glm::vec3(1.f)),
+			3.0
 	);
 	glEnable(GL_DEPTH_TEST);
 
 	// draw objects
-	drawObjectProc(
+	drawObjectPBR(
     spaceship,
-			glm::translate(glm::mat4(1.f), spaceship.pos) * 
-			specshipCameraRotrationMatrix * 
-      glm::eulerAngleY(glm::pi<float>()) * 
-      glm::scale(glm::mat4(1.f), glm::vec3(0.01))
+			glm::translate(glm::mat4(1.f), spaceship.pos) *
+			spaceshipCameraRotationMatrix *
+      glm::eulerAngleY(glm::pi<float>()) *
+      glm::scale(glm::mat4(1.f), glm::vec3(0.01)),
+			0.2, 1.0, 20.0
 	);
 
 	for(auto planet:planetStore.planets)
-		drawObjectProc(
+		drawObjectPBR(
 			*planet,
-			planet->getModelMatrix(time)
+			planet->getModelMatrix(time),
+			0.7, 0.0, 1.0
 		);
 
-	drawObjectProc(
+	drawObjectPBR(
     sun,
-    sun.getModelMatrix(time)
+    sun.getModelMatrix(time),
+		0.3, 0.0, 5.0
 	);
 
 	glfwSwapBuffers(window);
 }
 
-void OGraphicsEngine::drawObjectColor(OGameObject& obj, glm::mat4 modelMatrix, glm::vec3 color)
-{
-  GLuint prog = obj.getShader().getProgram();
-	glUseProgram(prog);
-	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * camera.GetViewMatrix();
-	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
-	glUniformMatrix4fv(glGetUniformLocation(prog, "transformation"), 1, GL_FALSE, (float*)&transformation);
-	glUniformMatrix4fv(glGetUniformLocation(prog, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
-	glUniform3f(glGetUniformLocation(prog, "color"), color.x, color.y, color.z);
-	glUniform3f(glGetUniformLocation(prog, "lightPos"), 0,0,0);
-	OResourceUnit::DrawContext(obj.getContext());
-	glUseProgram(0);
-}
-
-void OGraphicsEngine::drawObjectProc(OGameObject& obj, glm::mat4 modelMatrix) {
+void OGraphicsEngine::drawObjectPBR(OGameObject& obj, glm::mat4 modelMatrix, float roughness, float metallic, float exposition) {
 	GLuint program = obj.getShader().getProgram();
 	glUseProgram(program);
+
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * camera.GetViewMatrix();
 	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 	glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
 	glUniformMatrix4fv(glGetUniformLocation(program, "modelMatrix"), 1, GL_FALSE, (float*)&modelMatrix);
-	glUniform3f(glGetUniformLocation(program, "lightPos"), 0, 0, 0);
-	OResourceUnit::SetActiveTexture(obj.texture, "colorTexture", program, 0);
-	OResourceUnit::SetActiveTexture(obj.normal, "normalSampler", program, 1);
-	OResourceUnit::DrawContext(obj.getContext());
 
+	glUniform1f(glGetUniformLocation(program, "exposition"), exposition);
+
+	glUniform1f(glGetUniformLocation(program, "roughness"), roughness);
+	glUniform1f(glGetUniformLocation(program, "metallic"), metallic);
+
+	OResourceUnit::SetActiveTexture(obj.texture, "diffuseTexture", program, 0);
+	OResourceUnit::SetActiveTexture(obj.normal, "normalTexture", program, 1);
+
+	glUniform3f(glGetUniformLocation(program, "cameraPos"), camera.GetEye().x, camera.GetEye().y, camera.GetEye().z);
+
+	glUniform3f(glGetUniformLocation(program, "sunDir"), sunDir.x, sunDir.y, sunDir.z);
+	glUniform3f(glGetUniformLocation(program, "sunColor"), sunColor.x, sunColor.y, sunColor.z);
+
+	glUniform3f(glGetUniformLocation(program, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+	glUniform3f(glGetUniformLocation(program, "lightColor"), lightColor.x, lightColor.y, lightColor.z);
+
+	glUniform3f(glGetUniformLocation(program, "spotlightConeDir"), spotlightConeDir.x, spotlightConeDir.y, spotlightConeDir.z);
+	glUniform3f(glGetUniformLocation(program, "spotlightPos"), spotlightPos.x, spotlightPos.y, spotlightPos.z);
+	glUniform3f(glGetUniformLocation(program, "spotlightColor"), spotlightColor.x, spotlightColor.y, spotlightColor.z);
+	glUniform1f(glGetUniformLocation(program, "spotlightPhi"), spotlightPhi);
+
+	OResourceUnit::DrawContext(obj.getContext());
 	glUseProgram(0);
 }
 
-void OGraphicsEngine::drawObjectSkyBox(OGameObject& obj, glm::mat4 modelMatrix) {
+void OGraphicsEngine::drawObjectSkyBox(OGameObject& obj, glm::mat4 modelMatrix, float exposition) {
 	GLuint program = obj.getShader().getProgram();
 	glUseProgram(program);
 	glm::mat4 viewProjectionMatrix = createPerspectiveMatrix() * camera.GetViewMatrix();
 	glm::mat4 transformation = viewProjectionMatrix * modelMatrix;
 	glUniformMatrix4fv(glGetUniformLocation(program, "transformation"), 1, GL_FALSE, (float*)&transformation);
+	glUniform1f(glGetUniformLocation(program, "exposition"), exposition);
 	OResourceUnit::SetActiveCubeTexture(obj.texture, "skybox", program, 0);
 	OResourceUnit::DrawContext(obj.getContext());
 	glUseProgram(0);

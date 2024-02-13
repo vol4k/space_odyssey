@@ -1,5 +1,6 @@
 #pragma once
 #include <glm.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 class OCamera
@@ -9,7 +10,7 @@ class OCamera
 
   OCamera(glm::vec3 eye, glm::vec3 lookat, glm::vec3 upVector);
 
-  glm::mat4x4 GetViewMatrix() const;
+  glm::mat4 GetViewMatrix() const;
   glm::vec3 GetEye() const;
   glm::vec3 GetUpVector() const;
   glm::vec3 GetLookAt() const;

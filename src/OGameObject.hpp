@@ -12,8 +12,6 @@ class OGameObject
   OGameObject(OShaderUnit* shader, std::string modelfile, std::string texturefolder, glm::vec3 pos, glm::vec3 dir);
   // for default object
   OGameObject(OShaderUnit* shader, std::string modelfile, std::string texturefile, std::string normalfile, glm::vec3 pos, glm::vec3 dir, float deceleration=1.f, float scale=1.f);
-  // for cloud object
-  OGameObject(OShaderUnit* shader, std::string modelfile, glm::vec3 pos, glm::vec3 dir, float deceleration=1.f, float scale=1.f);
   ~OGameObject();
 
   void updateShader(OShaderUnit* shader);
@@ -23,6 +21,8 @@ class OGameObject
 
   glm::vec3 pos;
   glm::vec3 dir;
+  glm::vec3 up;
+  glm::vec3 side;
   GLuint texture;
   GLuint normal;
 
