@@ -9,6 +9,17 @@
 
 Computer graphics project at Adam Mickewicz University.
 
+> Equipped with a spacecraft that must be upgraded and prepared for the ultimate space exploration, your goal is to gather the maximum amount of resources, sourced from gold chunks scattered throughout space.
+
+
+- `W` - speed up
+- `S` - slow down
+- `A` - roll left
+- `D` - roll right
+- `R` - reload shaders
+- `L` - switch to arcball camera mode
+- `ESC` - exit
+
 ## Setup
 
 > The project compatible with ``Linux`` and ``Windows`` OS.
@@ -39,8 +50,9 @@ bash ./run.sh
   - [x] `SOIL2`     <br>_is a tiny C library used primarily for uploading textures into OpenGL._
 
 - [x] project features
-  - [x] Arcball Camera
-  - [x] Quaternions (Gimbal lock)
-  - [x] Normal mapping
-  - [x] Physics-based rendering (PBR)
-  - [x] SkyBox
+  - [x] Arcball Camera </br>![Arcball camera](./img/arcball_camera.jpg)
+  - [x] Quaternions (Gimbal lock) </br>![Quaternions](./img/quaternions.jpg)
+  - [x] Normal mapping </br>![Normal mapping](./img/normal_mapping.jpg)
+  - [x] Physics-based rendering (PBR) </br>![PBR](./img/pbr.jpg)
+  - [x] SkyBox </br>![SkyBox](./img/skybox.jpg)
+  - [x] Collision detection</br>![Collision detection](./img/collision.jpg)

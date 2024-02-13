@@ -30,6 +30,12 @@ OGame::~OGame()
   
   for(auto planet : planetStore.planets)
     delete planet;
+
+  for(auto asteroid : asteroidStore.asteroids)
+    delete asteroid;
+
+  for(auto gold : goldStore.gold_arr)
+    delete gold;
 }
 
 int OGame::run()
@@ -40,12 +46,32 @@ int OGame::run()
   while (!((OWindow*)engine)->windowShouldClose())
   {
     processInput();
+    checkCollision();
 
     renderScene();
     glfwPollEvents();
   }
 
   return EXIT_SUCCESS;
+}
+
+void OGame::checkCollision()
+{
+  if(!goalCounter)
+    gameWin();
+
+  if(spaceship->checkCollision(*sun)) gameOver();
+  for(auto& asteroid : asteroidStore.asteroids)
+    if(spaceship->checkCollision(*asteroid)) gameOver();
+  for(auto& planet : planetStore.planets)
+    if(spaceship->checkCollision(*planet)) gameOver();
+  for(auto& gold : goldStore.gold_arr)
+    if(spaceship->checkCollision(*gold))
+    {
+      goalCounter-=1;
+      std::cout << "Gold collected! " << goalCounter << " left" << std::endl;
+      gold->show = false;
+    }
 }
 
 void OGame::processInput()
@@ -112,7 +138,7 @@ void OGame::processInput()
 
 void OGame::renderScene()
 {
-	engine->render(*spaceship, planetStore, *sun, *skybox);
+	engine->render(*spaceship, planetStore, asteroidStore, goldStore, *sun, *skybox);
 }
 
 void OGame::reloadShaders()
@@ -132,18 +158,28 @@ void OGame::reloadShaders()
   spaceship->updateShader(spaceshipShader);
 
   for(auto planet : planetStore.planets)
-    planet->updateShader(sphereShader);    
+    planet->updateShader(sphereShader);
+
+  for(auto asteroid : asteroidStore.asteroids)
+    asteroid->updateShader(sphereShader);
+
+  for(auto gold : goldStore.gold_arr)
+    gold->updateShader(sphereShader);
 }
 
 void OGame::initResources()
 {
+  std::cout << "Itinialisation: resources\n";
   try
   {
+
+    std::cout << "Load shaders\n";
     sunShader = new OShaderUnit("sun.vert", "sun.frag");
     skyboxShader = new OShaderUnit("skybox.vert", "skybox.frag");
     sphereShader = new OShaderUnit("default.vert", "default.frag");
     spaceshipShader = new OShaderUnit("default.vert", "default.frag");
 
+    std::cout << "Load skybox\n";
     skybox = new OGameObject(
       skyboxShader,
       "cube.obj",
@@ -152,6 +188,7 @@ void OGame::initResources()
       glm::vec3(-1.f, 0.f, 0.f)
     );
 
+    std::cout << "Load spaceship\n";
     spaceship = new OGameObject(
       spaceshipShader,
       "spaceship.obj",
@@ -161,6 +198,7 @@ void OGame::initResources()
       glm::vec3(-1.f, 0.f, 0.f)
     );
 
+    std::cout << "Load sun\n";
     sun = new OGameObject(
       sunShader, 
       "sphere.obj",
@@ -173,7 +211,7 @@ void OGame::initResources()
     );
 
     // planets
-
+    std::cout << "Load planets\n";
     planetStore.planet.mercury = new OGameObject(
       sphereShader, 
       "sphere.obj",
@@ -181,7 +219,7 @@ void OGame::initResources()
       "mercury_normal.png",
       glm::vec3(-3.f, -1.f, 0.f), 
       glm::vec3(1.f, 0.f, 0.f),
-      rand()%50+25,
+      rand()%150+25,
       0.16f
     );
     planetStore.planet.venus = new OGameObject(
@@ -191,7 +229,7 @@ void OGame::initResources()
       "venus_normal.png",
       glm::vec3(-8.f, -1.f, 0.f), 
       glm::vec3(1.f, 0.f, 0.f),
-      rand()%50+25,
+      rand()%150+25,
       0.32f
     );
     planetStore.planet.earth = new OGameObject(
@@ -201,7 +239,7 @@ void OGame::initResources()
       "earth_normal.png",
       glm::vec3(-10.f, -1.f, 0.f), 
       glm::vec3(1.f, 0.f, 0.f),
-      rand()%50+25,
+      rand()%150+25,
       0.4f
     );
     planetStore.planet.mars = new OGameObject(
@@ -211,7 +249,7 @@ void OGame::initResources()
       "mars_normal.png",
       glm::vec3(-12.f, -1.f, 0.f), 
       glm::vec3(1.f, 0.f, 0.f),
-      rand()%50+25,
+      rand()%150+25,
       0.32f
     );
 
@@ -222,7 +260,7 @@ void OGame::initResources()
       "jupiter_normal.png",
       glm::vec3(-14.f, -1.f, 0.f), 
       glm::vec3(1.f, 0.f, 0.f),
-      rand()%50+25,
+      rand()%150+25,
       0.8f
     );
 
@@ -233,7 +271,7 @@ void OGame::initResources()
       "saturn_normal.png",
       glm::vec3(-16.f, -1.f, 0.f), 
       glm::vec3(1.f, 0.f, 0.f),
-      rand()%50+25,
+      rand()%150+25,
       0.48f
     );
     planetStore.planet.uranus = new OGameObject(
@@ -243,7 +281,7 @@ void OGame::initResources()
       "uranus_normal.png",
       glm::vec3(-18.f, -1.f, 0.f), 
       glm::vec3(1.f, 0.f, 0.f),
-      rand()%50+25,
+      rand()%150+25,
       0.48f
     );
     planetStore.planet.neptune = new OGameObject(
@@ -253,7 +291,7 @@ void OGame::initResources()
       "neptune_normal.png",
       glm::vec3(-20.f, -1.f, 0.f), 
       glm::vec3(1.f, 0.f, 0.f),
-      rand()%50+25,
+      rand()%150+25,
       0.4f
     );
     planetStore.planet.pluto = new OGameObject(
@@ -261,14 +299,57 @@ void OGame::initResources()
       "sphere.obj",
       "pluto.jpg",
       "pluto_normal.png",
-      glm::vec3(-22.f, -1.f, 0.f), 
+      glm::vec3(-22.f, -1.f, 0.f),
       glm::vec3(1.f, 0.f, 0.f),
-      rand()%50+25,
+      rand()%150+25,
       0.08f
     );
+
+    std::cout << "Load asteroids\n";
+    for(auto &asteroid : asteroidStore.asteroids)
+    {
+      int number = rand()%6+1;
+      asteroid = new OGameObject(
+        sphereShader, 
+        "asteroid.obj",
+        std::string("Aster_Small_") + std::to_string(number) + std::string("_Color.png"),
+        std::string("Aster_Small_") + std::to_string(number) + std::string("_NM.png"),
+        glm::vec3((rand()%50-100)/10.f, (rand()%5-10)/10.f, (rand()%5-10)/10.f),
+        glm::vec3(1.f, 0.f, 0.f),
+        rand()%150+25,
+        0.5f
+      );
+    } 
+
+    std::cout << "Load gold_arr\n";
+    for(auto& gold : goldStore.gold_arr)
+    {
+      gold = new OGameObject(
+        sunShader,
+        "sphere.obj",
+        "gold.png",
+        "gold_normal.png",
+        glm::vec3((rand()%50-100)/10.f, (rand()%5-10)/10.f, (rand()%5-10)/10.f),
+        glm::vec3(1.f, 0.f, 0.f),
+        100.f,
+        0.05f
+      );
+    }
   }
   catch(const std::exception& e)
   {
     std::cerr << e.what() << '\n';
   }
+}
+
+void OGame::gameOver()
+{
+  std::cout << "Game Over!" << std::endl;
+  glfwSetWindowShouldClose(engine->getWindow(), true);
+}
+
+void OGame::gameWin()
+{
+  std::cout << "Game win!" << std::endl;
+  glfwSetWindowShouldClose(engine->getWindow(), true);
 }

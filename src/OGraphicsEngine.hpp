@@ -26,6 +26,39 @@ union spheres {
     OGameObject* planets[9];
   };
 
+union aster {
+    struct {
+      OGameObject* _1;
+      OGameObject* _2;
+      OGameObject* _3;
+      OGameObject* _4;
+      OGameObject* _5;
+      OGameObject* _6;
+    } asteroid;
+    OGameObject* asteroids[9];
+  };
+
+union goal {
+    struct {
+      OGameObject* _1;
+      OGameObject* _2;
+      OGameObject* _3;
+      OGameObject* _4;
+      OGameObject* _5;
+      OGameObject* _6;
+      OGameObject* _7;
+      OGameObject* _8;
+      OGameObject* _9;
+      OGameObject* _10;
+      OGameObject* _11;
+      OGameObject* _12;
+      OGameObject* _13;
+      OGameObject* _14;
+      OGameObject* _15;
+    } gold;
+    OGameObject* gold_arr[15];
+  };
+
 template <typename t> int sgn(t val) {
     return (t(0) < val) - (val < t(0));
 }
@@ -70,5 +103,5 @@ class OGraphicsEngine: private OWindow
 
   GLFWwindow* getWindow();
 
-  void render(OGameObject& spaceship, spheres planetStore, OGameObject& sun, OGameObject& skybox);
+  void render(OGameObject& spaceship, spheres planetStore,aster asteroidStore, goal goldStore, OGameObject& sun, OGameObject& skybox);
 };

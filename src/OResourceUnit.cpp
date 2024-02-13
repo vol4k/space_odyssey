@@ -100,7 +100,29 @@ void OResourceUnit::loadModelToContext(std::string filename, OResourceUnit::Rend
 		std::cerr << "ERROR::ASSIMP::" << import.GetErrorString() << std::endl;
 		return;
 	}
-	context.initFromAssimpMesh(scene->mMeshes[0]);
+
+    aiNode* rootNode = scene->mRootNode;
+    aiMatrix4x4 scalingMatrix;
+    aiMatrix4x4::Scaling(aiVector3D(1.f, 1.f, 1.f), scalingMatrix);
+
+    // Recursively traverse each node and apply scaling to vertices
+    applyScalingToNode(scene, rootNode, scalingMatrix);
+	
+    context.initFromAssimpMesh(scene->mMeshes[0]);
+}
+
+// Recursively apply scaling to all vertices of the model
+void OResourceUnit::applyScalingToNode(const aiScene* scene, aiNode* node, const aiMatrix4x4& scalingMatrix) {
+    // Apply scaling to vertices of the current node
+    for (unsigned int i = 0; i < node->mNumMeshes; ++i) {
+        aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+        for (unsigned int j = 0; j < mesh->mNumVertices; ++j) {
+            mesh->mVertices[j] *= scalingMatrix;
+        }
+    }
+
+
+    
 }
 
 GLuint OResourceUnit::LoadTexture(std::string filename)

@@ -25,6 +25,10 @@ class OGame
   OGameObject* spaceship;
 
   spheres planetStore;
+  aster asteroidStore;
+  goal goldStore;
+
+  int goalCounter = 15;
 
   float acceleration = 0.01f;
 
@@ -32,4 +36,7 @@ class OGame
   void reloadShaders();
   void renderScene();
   void initResources();
+  void gameOver();
+  void gameWin();
+  void checkCollision();
 };

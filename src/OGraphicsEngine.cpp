@@ -77,7 +77,7 @@ void OGraphicsEngine::updateCamera()
 	lastMousePos.y = viewportHeight/2;
 }
 
-void OGraphicsEngine::render(OGameObject& spaceship, spheres planetStore, OGameObject& sun, OGameObject& skybox)
+void OGraphicsEngine::render(OGameObject& spaceship, spheres planetStore, aster asteroidStore, goal goldStore, OGameObject& sun, OGameObject& skybox)
 {
   // init
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -127,6 +127,23 @@ void OGraphicsEngine::render(OGameObject& spaceship, spheres planetStore, OGameO
 			planet->getModelMatrix(time),
 			0.7, 0.0, 1.0
 		);
+
+	for(auto asteroid:asteroidStore.asteroids)
+		drawObjectPBR(
+			*asteroid,
+			asteroid->getModelMatrix(time),
+			0.7, 0.0, 3.0
+		);
+
+	for(auto gold:goldStore.gold_arr)
+	{
+		if(gold->show)
+			drawObjectPBR(
+				*gold,
+				gold->getModelMatrix(time),
+				0.7, 0.0, 10.0
+			);
+	}
 
 	drawObjectPBR(
     sun,

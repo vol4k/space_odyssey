@@ -29,6 +29,7 @@ namespace OResourceUnit
 
 	void DrawContext(RenderContext& context);
 	void loadModelToContext(std::string filename, OResourceUnit::RenderContext& context);
+	void applyScalingToNode(const aiScene* scene, aiNode* node, const aiMatrix4x4& scalingMatrix);
 
 	GLuint LoadTexture(std::string filename);
 	GLuint LoadCubeTexture(std::string foldername);
