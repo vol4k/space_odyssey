@@ -4,6 +4,7 @@
 * [General info](#general-info)
 * [Setup](#setup)
 * [TODO](#todo)
+* [Video demonstration](#demo)
 
 ## General info
 
@@ -56,3 +57,7 @@ bash ./run.sh
   - [x] Physics-based rendering (PBR) </br>![PBR](./img/pbr.jpg)
   - [x] SkyBox </br>![SkyBox](./img/skybox.jpg)
   - [x] Collision detection</br>![Collision detection](./img/collision.jpg)
+
+## Demo
+
+[![Demo](./img/normal_mapping.jpg)](https://youtu.be/k3ZNwEc1lKM)
