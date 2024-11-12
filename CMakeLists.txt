@@ -32,15 +32,6 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMENT "Copying resources into binary directory"
 )
 
-# New in 3.26
-#add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-#    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different 
-#    ${PROJECT_SOURCE_DIR}/res 
-#    ${PROJECT_BINARY_DIR}/res
-#    COMMENT "Update resources if it change"
-#)
-
-
 add_subdirectory(deps/glew)
 add_subdirectory(deps/glfw)
 add_subdirectory(deps/glm)

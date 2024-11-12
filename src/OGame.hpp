@@ -18,19 +18,22 @@ class OGame
   OShaderUnit* sunShader;
   OShaderUnit* skyboxShader;
   OShaderUnit* spaceshipShader;
-  OShaderUnit* sphereShader;
+  OShaderUnit* defaultShader;
 
   OGameObject* sun;
+
   OGameObject* skybox;
   OGameObject* spaceship;
+  OGameObject* spaceshipEngine;
+  OGameObject* goal;
 
   spheres planetStore;
   aster asteroidStore;
-  goal goldStore;
 
   int goalCounter = 15;
 
   float acceleration = 0.01f;
+  glm::vec3 accelerationXYZ = {0.f, 0.f, 0.f};
 
   void processInput();
   void reloadShaders();
@@ -38,5 +41,5 @@ class OGame
   void initResources();
   void gameOver();
   void gameWin();
-  void checkCollision();
+  void collisionTest();
 };

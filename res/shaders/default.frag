@@ -8,7 +8,6 @@ uniform vec3 cameraPos;
 uniform sampler2D diffuseTexture;
 uniform sampler2D normalTexture;
 
-uniform vec3 sunDir;
 uniform vec3 sunColor;
 
 uniform vec3 lightPos;
@@ -24,7 +23,6 @@ uniform float roughness;
 uniform float exposition;
 
 in vec2 texCoords;
-in vec3 vecNormal;
 in vec3 worldPos;
 
 in vec3 viewDirTS;
@@ -68,10 +66,9 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0){
 } 
 
 vec3 PBRLight(vec3 lightDir, vec3 radiance, vec3 normal, vec3 V){
-	float diffuse=max(0,dot(normal,lightDir));
+	float diffuse=max(0,dot(normal,lightDir)) * 2;
 
 	vec3 baseColor = texture(diffuseTexture, texCoords).rgb;
-	//vec3 V = normalize(cameraPos-worldPos);
 	vec3 F0 = vec3(0.04); 
     F0 = mix(F0, baseColor, metallic);
 
@@ -92,39 +89,33 @@ vec3 PBRLight(vec3 lightDir, vec3 radiance, vec3 normal, vec3 V){
             
     // add to outgoing radiance Lo
     float NdotL = max(dot(normal, lightDir), 0.0);   
-	return (kD * baseColor / PI + specular) * radiance * NdotL;
+	return (kD * baseColor / PI + specular) * radiance * NdotL * diffuse;
 }
 
 
 void main()
 {
-	//vec3 normal = vec3(0,0,1);
-    vec3 normal = texture(normalTexture, texCoords).xyz  * 2.0 - 1.0;
-
-    vec3 viewDir = normalize(viewDirTS);
-    //vec3 viewDir = normalize(cameraPos-worldPos);
+   vec3 normal = texture(normalTexture, texCoords).xyz  * 2.0 - 1.0;
 
 	vec3 lightDir = normalize(  lightDirTS);
-	//vec3 lightDir = normalize(lightPos-worldPos);
 	
 	vec3 baseColor = texture(diffuseTexture, texCoords).rgb;
 
 	vec3 ambient = AMBIENT*baseColor;
 	vec3 attenuatedlightColor = lightColor/pow(length(lightPos-worldPos),2);
 	vec3 ilumination;
-	ilumination = ambient+PBRLight(lightDir,attenuatedlightColor,normal,viewDir);
+	ilumination = ambient+PBRLight(lightDir,attenuatedlightColor,normal,viewDirTS);
 	
 	//flashlight
 	vec3 spotlightDir= normalize(spotlightDirTS);
-	//vec3 spotlightDir= normalize(spotlightPos-worldPos);
 	
 
     float angle_atenuation = clamp((dot(-normalize(spotlightPos-worldPos),spotlightConeDir)-0.5)*3,0,1);
-	attenuatedlightColor = angle_atenuation*spotlightColor/pow(length(spotlightPos-worldPos),2);
-	ilumination=ilumination+PBRLight(spotlightDir,attenuatedlightColor,normal,viewDir);
+	attenuatedlightColor = angle_atenuation *spotlightColor/pow(length(spotlightPos-worldPos),2);
+	ilumination=ilumination+PBRLight(spotlightDir,attenuatedlightColor*0.05,normal,viewDirTS);
 
 	//sun
-	ilumination=ilumination+PBRLight(sunDirTS,sunColor,normal,viewDir);
+	ilumination=ilumination+PBRLight(sunDirTS,sunColor,normal,viewDirTS);
 
     
 	outColor = vec4(vec3(1.0) - exp(-ilumination*exposition),1);
